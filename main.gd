@@ -1,19 +1,22 @@
 extends Control
 
 var shapes = []
-var gizmo_selected_shape = null
+var gizmo_anchor = null
 var mat_outline = null
+var inspector_cur_object = null
 
 @onready var scene = $BC/BC_center/SubViewportContainer/SubViewport/Scene3D
 @onready var shape_list = $BC/BC_left/shape_list
 @onready var camera = $BC/BC_center/SubViewportContainer/SubViewport/Scene3D/Camera3D
+@onready var inspector = $BC/BC_right/P
 
-func ready():
-	#generate a material for selected object outline
+func _ready():
+	# generate a material for selected object outline
 	mat_outline = StandardMaterial3D.new()
-	mat_outline.rim_enabled = true
-	mat_outline.rim = 0.25
-	mat_outline.disable_receive_shadows = true
+	mat_outline.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED; 
+	# initialize inspector panel
+	register_inspector();
+	
 
 func create_body(type):
 	var body = StaticBody3D.new()
@@ -26,6 +29,7 @@ func create_body(type):
 	elif type == "cylinder":
 		vis_shape = CSGCylinder3D.new()
 		col_shape = CylinderShape3D.new()
+	vis_shape.material = StandardMaterial3D.new()
 	body.add_child(vis_shape);
 	var collider = CollisionShape3D.new();
 	collider.shape = col_shape;
@@ -68,21 +72,28 @@ func viewport_click(mouse_pos:Vector2):
 	var hit = space_state.intersect_ray(ray_query)
 	if hit:
 		print("hit "+hit.collider.name)
-		var shape_info = get_shape_info(hit.collider)
+		var shape_info = get_shape_info_collider(hit.collider)
 		if shape_info:
 			print("this is ["+shape_info.body.name+"]")
 			shape_click(shape_info);
 		else:
 			print("not ours")
+			void_click();
 	else:
 		print("no hit")
+		void_click();
 
-func get_shape_info(collider):
+func get_shape_info_collider(collider):
 	for shape_info in shapes:
 		if(shape_info.body == collider):
 			return shape_info
 	return null
 
+func get_shape_info_idx(idx):
+	for shape_info in shapes:
+		if(shape_info.list_idx == idx):
+			return shape_info
+	return null
 
 func _on_btn_clear_pressed() -> void:
 	for shape_info in shapes:
@@ -93,17 +104,115 @@ func _on_btn_clear_pressed() -> void:
 func shape_click(shape_info):
 	deselect_shape();
 	select_shape(shape_info);
+
+func void_click():
+	deselect_shape();
 	
 func deselect_shape():
-	if gizmo_selected_shape:
-		gizmo_selected_shape.queue_free()
-	gizmo_selected_shape = null
+	remove_gizmo();
+	shape_list.deselect_all();
+	close_inspector();
+	
+func remove_gizmo():
+	if gizmo_anchor:
+		gizmo_anchor.queue_free()
+	gizmo_anchor = null
+
+func apply_gizmo(shape_info):
+	remove_gizmo();
+	var vis_shape:Node3D = shape_info.vis_shape;
+	var gizmo = vis_shape.duplicate();
+	#gizmo.transform = shape_info.body.transform
+	gizmo.scale *= 1.05;
+	gizmo.material = mat_outline;
+	gizmo.flip_faces = true;
+	gizmo_anchor = Node3D.new();
+	gizmo_anchor.add_child(gizmo);
+	shape_info.body.add_child(gizmo_anchor);
+
+func reapply_gizmo():
+	var shape = inspector_cur_object;
+	remove_gizmo();
+	if shape: apply_gizmo(shape);
 
 func select_shape(shape_info):
-	var vis_shape:Node3D = shape_info.vis_shape;
-	gizmo_selected_shape = vis_shape.duplicate()
-	gizmo_selected_shape.scale *= 1.1;
-	gizmo_selected_shape.material = mat_outline;
-	gizmo_selected_shape.flip_faces = true;
-	scene.add_child(gizmo_selected_shape);
+	apply_gizmo(shape_info)
+	shape_list.select(shape_info.list_idx)
+	open_inspector(shape_info);
+
+func _on_shape_list_item_selected(index: int) -> void:
+	var shape_info =  get_shape_info_idx(index);
+	select_shape(shape_info);
+
+func _on_shape_list_empty_clicked(at_position: Vector2, mouse_button_index: int) -> void:
+	deselect_shape();
 	
+func open_inspector(shape_info):
+	inspector_cur_object = shape_info;
+	inspector.show()
+	update_inspector();
+
+func close_inspector(): inspector.hide();
+
+func on_inspector_changed(_dummy):
+	print("inspector changed");
+	write_inspector();
+	update_inspector();
+	reapply_gizmo();
+
+func register_inspector():
+	var lblName:Label = inspector.find_child("lblName");
+	var col_picker:ColorPickerButton = inspector.find_child("col_picker");
+	var le_pos:LineEdit = inspector.find_child("lePos");
+	var le_size:LineEdit = inspector.find_child("leSize");
+	var le_rot:LineEdit = inspector.find_child("leRot");
+	col_picker.color_changed.connect(on_inspector_changed);
+	le_pos.text_submitted.connect(on_inspector_changed);
+	le_size.text_submitted.connect(on_inspector_changed);
+	le_rot.text_submitted.connect(on_inspector_changed);
+
+func update_inspector():
+	var lblName:Label = inspector.find_child("lblName");
+	var col_picker:ColorPickerButton = inspector.find_child("col_picker");
+	var le_pos:LineEdit = inspector.find_child("lePos");
+	var le_size:LineEdit = inspector.find_child("leSize");
+	var le_rot:LineEdit = inspector.find_child("leRot");
+	var obj = inspector_cur_object;
+	var body:StaticBody3D = obj.body;
+	var vis_shape = obj.vis_shape;
+	var mat:StandardMaterial3D = vis_shape.material;
+	
+	lblName.text = body.name;
+	col_picker.color = mat.albedo_color;
+	le_pos.text  = str(body.position);
+	le_size.text = get_shape_size(obj);
+	le_rot.text  = str(body.rotation_degrees);
+
+func write_inspector():
+	var lblName:Label = inspector.find_child("lblName");
+	var col_picker:ColorPickerButton = inspector.find_child("col_picker");
+	var le_pos:LineEdit = inspector.find_child("lePos");
+	var le_size:LineEdit = inspector.find_child("leSize");
+	var le_rot:LineEdit = inspector.find_child("leRot");
+	var obj = inspector_cur_object;
+	var body:StaticBody3D = obj.body;
+	var vis_shape = obj.vis_shape;
+	var mat:StandardMaterial3D = vis_shape.material;
+	
+	mat.albedo_color = col_picker.color
+	body.position = str_to_vec3(le_pos.text, Vector3());
+	set_shape_size(obj, str_to_vec3(le_size.text, Vector3(1,1,1)));
+	body.rotation_degrees = str_to_vec3(le_rot.text, Vector3());
+	
+func str_to_vec3(string, default):
+	var components = string.replace("(","").replace(")","").split_floats(",")
+	if len(components) == 3:
+		return Vector3(components[0],components[1],components[2])
+	else:
+		return default;
+
+func get_shape_size(shape_info): #unimplemented
+	return str(Vector3(1,1,1));
+	
+func set_shape_size(shape_info, new_size:Vector3): #unimplemented
+	pass

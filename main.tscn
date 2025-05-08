@@ -19,8 +19,7 @@ glow_enabled = true
 albedo_color = Color(0.628358, 0.68742, 0.108291, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ig7tw"]
-rim_enabled = true
-rim = 0.25
+shading_mode = 0
 disable_receive_shadows = true
 
 [node name="Main" type="Control"]
@@ -65,7 +64,9 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="SubViewport" type="SubViewport" parent="BC/BC_center/SubViewportContainer"]
+handle_input_locally = false
 size = Vector2i(687, 648)
+render_target_update_mode = 4
 
 [node name="Scene3D" type="Node3D" parent="BC/BC_center/SubViewportContainer/SubViewport"]
 
@@ -86,10 +87,12 @@ current = true
 [node name="BC_right" type="BoxContainer" parent="BC"]
 layout_mode = 2
 size_flags_horizontal = 3
+vertical = true
 
 [node name="GC" type="GridContainer" parent="BC/BC_right"]
 layout_mode = 2
 size_flags_horizontal = 3
+columns = 2
 
 [node name="btnBox" type="Button" parent="BC/BC_right/GC"]
 layout_mode = 2
@@ -103,12 +106,68 @@ text = "Add cylinder"
 layout_mode = 2
 text = "CLEAR"
 
-[node name="ColorPickerButton" type="ColorPickerButton" parent="BC/BC_right/GC"]
+[node name="P" type="Panel" parent="BC/BC_right"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="GC" type="GridContainer" parent="BC/BC_right/P"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+columns = 2
+
+[node name="lbl1" type="Label" parent="BC/BC_right/P/GC"]
+layout_mode = 2
+text = "Properties"
+
+[node name="Control" type="Control" parent="BC/BC_right/P/GC"]
+layout_mode = 2
+
+[node name="lbl2" type="Label" parent="BC/BC_right/P/GC"]
+layout_mode = 2
+text = "Name"
+
+[node name="lblName" type="Label" parent="BC/BC_right/P/GC"]
+layout_mode = 2
+
+[node name="lbl3" type="Label" parent="BC/BC_right/P/GC"]
+layout_mode = 2
+text = "Color"
+
+[node name="col_picker" type="ColorPickerButton" parent="BC/BC_right/P/GC"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Color"
 color = Color(0.481789, 0.481789, 0.481789, 1)
 
+[node name="lbl4" type="Label" parent="BC/BC_right/P/GC"]
+layout_mode = 2
+text = "Position"
+
+[node name="lePos" type="LineEdit" parent="BC/BC_right/P/GC"]
+layout_mode = 2
+
+[node name="lbl5" type="Label" parent="BC/BC_right/P/GC"]
+layout_mode = 2
+text = "Size"
+
+[node name="leSize" type="LineEdit" parent="BC/BC_right/P/GC"]
+layout_mode = 2
+
+[node name="lbl6" type="Label" parent="BC/BC_right/P/GC"]
+layout_mode = 2
+text = "Rotation"
+
+[node name="leRot" type="LineEdit" parent="BC/BC_right/P/GC"]
+layout_mode = 2
+
+[connection signal="empty_clicked" from="BC/BC_left/shape_list" to="." method="_on_shape_list_empty_clicked"]
+[connection signal="item_selected" from="BC/BC_left/shape_list" to="." method="_on_shape_list_item_selected"]
 [connection signal="gui_input" from="BC/BC_center/SubViewportContainer" to="." method="_on_sub_viewport_container_gui_input"]
 [connection signal="pressed" from="BC/BC_right/GC/btnBox" to="." method="_on_btn_box_pressed"]
 [connection signal="pressed" from="BC/BC_right/GC/btnCylinder" to="." method="_on_btn_cylinder_pressed"]
