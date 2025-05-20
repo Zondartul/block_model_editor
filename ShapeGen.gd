@@ -10,8 +10,11 @@ class_name ShapeGenerator
 var n_collider:Node = null;
 var n_vis_shape:Node = null;
 
-# (re)generates the associated shapes.
+# generates the associated shapes.
 func gen_shapes() -> void: pass;
+
+# updates the associated shapes with new params.
+func update_shapes() -> void: pass;
 
 # adds the managed
 func attach(parent:Node) -> void:

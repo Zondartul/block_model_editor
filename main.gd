@@ -5,10 +5,14 @@ var gizmo_anchor = null
 var mat_outline = null
 var inspector_cur_object = null
 
+var script_shapegen = preload("res://ShapeGen.gd");
+var script_shapegenbox = preload("res://ShapeGenBox.gd");
+
 @onready var scene = $BC/BC_center/SubViewportContainer/SubViewport/Scene3D
 @onready var shape_list = $BC/BC_left/shape_list
 @onready var camera = $BC/BC_center/SubViewportContainer/SubViewport/Scene3D/Camera3D
 @onready var inspector = $BC/BC_right/P
+@onready var n_inspector_grid = $BC/BC_right/P/BC/GC2
 
 func _ready():
 	# generate a material for selected object outline
@@ -18,23 +22,36 @@ func _ready():
 	register_inspector();
 	
 
+#func create_body(type):
+	#var body = StaticBody3D.new()
+	#body.name = type;
+	#var vis_shape;
+	#var col_shape;
+	#if type == "box":
+		#vis_shape = CSGBox3D.new()
+		#col_shape = BoxShape3D.new()
+	#elif type == "cylinder":
+		#vis_shape = CSGCylinder3D.new()
+		#col_shape = CylinderShape3D.new()
+	#vis_shape.material = StandardMaterial3D.new()
+	#body.add_child(vis_shape);
+	#var collider = CollisionShape3D.new();
+	#collider.shape = col_shape;
+	#body.add_child(collider);
+	#var dict = {"body":body,"vis_shape":vis_shape,"col_shape":col_shape,"collider":collider}
+	#return dict;
+
 func create_body(type):
 	var body = StaticBody3D.new()
 	body.name = type;
-	var vis_shape;
-	var col_shape;
+	var gen:ShapeGenerator;
 	if type == "box":
-		vis_shape = CSGBox3D.new()
-		col_shape = BoxShape3D.new()
+		gen = ShapeGenBox.new();
 	elif type == "cylinder":
-		vis_shape = CSGCylinder3D.new()
-		col_shape = CylinderShape3D.new()
-	vis_shape.material = StandardMaterial3D.new()
-	body.add_child(vis_shape);
-	var collider = CollisionShape3D.new();
-	collider.shape = col_shape;
-	body.add_child(collider);
-	var dict = {"body":body,"vis_shape":vis_shape,"col_shape":col_shape,"collider":collider}
+		pass
+	gen.gen_shapes();
+	gen.attach(body);
+	var dict = {"body":body,"generator":gen, "vis_shape":gen.n_vis_shape,"collider":gen.n_collider}
 	return dict;
 
 func addShape(type):
@@ -61,6 +78,30 @@ func _on_sub_viewport_container_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			viewport_click(event.position)
+		if event.button_index == MOUSE_BUTTON_MIDDLE and event.pressed:
+			viewport_mmb_down(event.position)
+		if event.button_index == MOUSE_BUTTON_MIDDLE and not event.pressed:
+			viewport_mmb_up(event.position)
+		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
+			viewport_mwheel_down(event.position)
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
+			viewport_mwheel_up(event.position)
+		
+	if event is InputEventMouseMotion:
+		viewport_mouseMove(event.position, event.relative);
+
+var navball_dragging = false;
+@onready var n_cam_anchor = $BC/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor
+func viewport_mmb_down(pos:Vector2): navball_dragging = true;
+func viewport_mmb_up(pos:Vector2): navball_dragging = false;
+func viewport_mouseMove(pos:Vector2, rel:Vector2):
+	var sensitivity = 0.01;
+	if navball_dragging:
+		n_cam_anchor.rotate_x(-rel.y*sensitivity);
+		n_cam_anchor.rotate_y(-rel.x*sensitivity);
+		n_cam_anchor.rotation.z = 0.0;
+func viewport_mwheel_down(pos): pass
+func viewport_mwheel_up(pos): pass
 
 func viewport_click(mouse_pos:Vector2):
 	print("Mouse clicked at: ", mouse_pos)
@@ -149,12 +190,15 @@ func _on_shape_list_empty_clicked(at_position: Vector2, mouse_button_index: int)
 	
 func open_inspector(shape_info):
 	inspector_cur_object = shape_info;
+	populate_inspector_params();
 	inspector.show()
 	update_inspector();
 
 func close_inspector(): inspector.hide();
 
+var inspector_ignore_signals = false;
 func on_inspector_changed(_dummy):
+	if inspector_ignore_signals: return;
 	print("inspector changed");
 	write_inspector();
 	update_inspector();
@@ -172,6 +216,7 @@ func register_inspector():
 	le_rot.text_submitted.connect(on_inspector_changed);
 
 func update_inspector():
+	inspector_ignore_signals = true;
 	var lblName:Label = inspector.find_child("lblName");
 	var col_picker:ColorPickerButton = inspector.find_child("col_picker");
 	var le_pos:LineEdit = inspector.find_child("lePos");
@@ -187,6 +232,8 @@ func update_inspector():
 	le_pos.text  = str(body.position);
 	le_size.text = get_shape_size(obj);
 	le_rot.text  = str(body.rotation_degrees);
+	update_inspector_params();
+	inspector_ignore_signals = false;
 
 func write_inspector():
 	var lblName:Label = inspector.find_child("lblName");
@@ -203,6 +250,7 @@ func write_inspector():
 	body.position = str_to_vec3(le_pos.text, Vector3());
 	set_shape_size(obj, str_to_vec3(le_size.text, Vector3(1,1,1)));
 	body.rotation_degrees = str_to_vec3(le_rot.text, Vector3());
+	write_inspector_params();
 	
 func str_to_vec3(string, default):
 	var components = string.replace("(","").replace(")","").split_floats(",")
@@ -216,3 +264,36 @@ func get_shape_size(shape_info): #unimplemented
 	
 func set_shape_size(shape_info, new_size:Vector3): #unimplemented
 	pass
+
+func populate_inspector_params():
+	for ch in n_inspector_grid.get_children(): ch.queue_free()
+	var params = inspector_cur_object.generator.get_param_list();
+	for p in params:
+		var lbl = Label.new()
+		lbl.text = p.name;
+		n_inspector_grid.add_child(lbl);
+		var entry;
+		if p.type == "float":
+			entry = SpinBox.new()
+			entry.step = 0.01;
+			if p.range:
+				entry.min_value = p.range[0];
+				entry.max_value = p.range[1];
+				entry.allow_greater = false;
+				entry.allow_lesser = false;
+			entry.value_changed.connect(on_inspector_changed);
+		n_inspector_grid.add_child(entry);
+
+func update_inspector_params():
+	var controls = n_inspector_grid.get_children();
+	for i in range(0, len(controls)/2):
+		var lbl = controls[i*2];
+		var entry = controls[i*2+1];
+		entry.value = inspector_cur_object.generator.get_param(lbl.text);
+
+func write_inspector_params():
+	var controls = n_inspector_grid.get_children();
+	for i in range(0, len(controls)/2):
+		var lbl = controls[i*2];
+		var entry = controls[i*2+1];
+		inspector_cur_object.generator.set_param(lbl.text, entry.value);

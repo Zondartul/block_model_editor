@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://b7s3y7kocru08"]
+[gd_scene load_steps=11 format=3 uid="uid://b7s3y7kocru08"]
 
 [ext_resource type="Script" uid="uid://ccp76xtdaxhfo" path="res://main.gd" id="1_ig7tw"]
 
@@ -21,6 +21,23 @@ albedo_color = Color(0.628358, 0.68742, 0.108291, 1)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ig7tw"]
 shading_mode = 0
 disable_receive_shadows = true
+
+[sub_resource type="Gradient" id="Gradient_ig7tw"]
+offsets = PackedFloat32Array(0, 0.440298, 0.447761, 0.522388, 0.962687, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0.770301, 0.770301, 0.770301, 1, 0.135467, 0.135467, 0.135467, 1, 0.0903111, 0.0903111, 0.0903111, 1, 0.940298, 0.940298, 0.940298, 1, 1, 1, 1, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_0xm2m"]
+frequency = 0.0189
+fractal_octaves = 2
+fractal_lacunarity = 8.31
+fractal_gain = 3.42
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_h2yge"]
+color_ramp = SubResource("Gradient_ig7tw")
+noise = SubResource("FastNoiseLite_0xm2m")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1bvp3"]
+albedo_texture = SubResource("NoiseTexture2D_h2yge")
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -80,7 +97,14 @@ visible = false
 flip_faces = true
 material = SubResource("StandardMaterial3D_ig7tw")
 
-[node name="Camera3D" type="Camera3D" parent="BC/BC_center/SubViewportContainer/SubViewport/Scene3D"]
+[node name="CSGBox3D3" type="CSGBox3D" parent="BC/BC_center/SubViewportContainer/SubViewport/Scene3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0848999, -0.672178, -0.104065)
+size = Vector3(3.29504, 0.307129, 4.21277)
+material = SubResource("StandardMaterial3D_1bvp3")
+
+[node name="cam_anchor" type="Node3D" parent="BC/BC_center/SubViewportContainer/SubViewport/Scene3D"]
+
+[node name="Camera3D" type="Camera3D" parent="BC/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor"]
 transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 1, 2)
 current = true
 
@@ -107,64 +131,74 @@ layout_mode = 2
 text = "CLEAR"
 
 [node name="P" type="Panel" parent="BC/BC_right"]
-visible = false
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="GC" type="GridContainer" parent="BC/BC_right/P"]
+[node name="BC" type="BoxContainer" parent="BC/BC_right/P"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+vertical = true
+
+[node name="GC" type="GridContainer" parent="BC/BC_right/P/BC"]
+layout_mode = 2
+size_flags_horizontal = 3
 columns = 2
 
-[node name="lbl1" type="Label" parent="BC/BC_right/P/GC"]
+[node name="lbl1" type="Label" parent="BC/BC_right/P/BC/GC"]
 layout_mode = 2
 text = "Properties"
 
-[node name="Control" type="Control" parent="BC/BC_right/P/GC"]
+[node name="Control" type="Control" parent="BC/BC_right/P/BC/GC"]
 layout_mode = 2
 
-[node name="lbl2" type="Label" parent="BC/BC_right/P/GC"]
+[node name="lbl2" type="Label" parent="BC/BC_right/P/BC/GC"]
 layout_mode = 2
 text = "Name"
 
-[node name="lblName" type="Label" parent="BC/BC_right/P/GC"]
+[node name="lblName" type="Label" parent="BC/BC_right/P/BC/GC"]
 layout_mode = 2
 
-[node name="lbl3" type="Label" parent="BC/BC_right/P/GC"]
+[node name="lbl3" type="Label" parent="BC/BC_right/P/BC/GC"]
 layout_mode = 2
 text = "Color"
 
-[node name="col_picker" type="ColorPickerButton" parent="BC/BC_right/P/GC"]
+[node name="col_picker" type="ColorPickerButton" parent="BC/BC_right/P/BC/GC"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Color"
 color = Color(0.481789, 0.481789, 0.481789, 1)
 
-[node name="lbl4" type="Label" parent="BC/BC_right/P/GC"]
+[node name="lbl4" type="Label" parent="BC/BC_right/P/BC/GC"]
 layout_mode = 2
 text = "Position"
 
-[node name="lePos" type="LineEdit" parent="BC/BC_right/P/GC"]
+[node name="lePos" type="LineEdit" parent="BC/BC_right/P/BC/GC"]
 layout_mode = 2
 
-[node name="lbl5" type="Label" parent="BC/BC_right/P/GC"]
+[node name="lbl5" type="Label" parent="BC/BC_right/P/BC/GC"]
 layout_mode = 2
 text = "Size"
 
-[node name="leSize" type="LineEdit" parent="BC/BC_right/P/GC"]
+[node name="leSize" type="LineEdit" parent="BC/BC_right/P/BC/GC"]
 layout_mode = 2
+editable = false
 
-[node name="lbl6" type="Label" parent="BC/BC_right/P/GC"]
+[node name="lbl6" type="Label" parent="BC/BC_right/P/BC/GC"]
 layout_mode = 2
 text = "Rotation"
 
-[node name="leRot" type="LineEdit" parent="BC/BC_right/P/GC"]
+[node name="leRot" type="LineEdit" parent="BC/BC_right/P/BC/GC"]
 layout_mode = 2
+
+[node name="GC2" type="GridContainer" parent="BC/BC_right/P/BC"]
+layout_mode = 2
+size_flags_vertical = 3
+columns = 2
 
 [connection signal="empty_clicked" from="BC/BC_left/shape_list" to="." method="_on_shape_list_empty_clicked"]
 [connection signal="item_selected" from="BC/BC_left/shape_list" to="." method="_on_shape_list_item_selected"]
