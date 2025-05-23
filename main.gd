@@ -7,10 +7,12 @@ var inspector_cur_object = null
 
 var script_shapegen = preload("res://ShapeGen.gd");
 var script_shapegenbox = preload("res://ShapeGenBox.gd");
+var script_shapegencylinder = preload("res://ShapeGenCylinder.gd");
+var script_shapegensphere = preload("res://ShapeGenSphere.gd");
 
 @onready var scene = $BC/BC_center/SubViewportContainer/SubViewport/Scene3D
 @onready var shape_list = $BC/BC_left/shape_list
-@onready var camera = $BC/BC_center/SubViewportContainer/SubViewport/Scene3D/Camera3D
+@onready var camera = $BC/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor/Camera3D
 @onready var inspector = $BC/BC_right/P
 @onready var n_inspector_grid = $BC/BC_right/P/BC/GC2
 
@@ -48,7 +50,9 @@ func create_body(type):
 	if type == "box":
 		gen = ShapeGenBox.new();
 	elif type == "cylinder":
-		pass
+		gen = ShapeGenCylinder.new();
+	elif type == "sphere":
+		gen = ShapeGenSphere.new();
 	gen.gen_shapes();
 	gen.attach(body);
 	var dict = {"body":body,"generator":gen, "vis_shape":gen.n_vis_shape,"collider":gen.n_collider}
@@ -69,10 +73,11 @@ func update_shape_list():
 
 func addBox():	addShape("box")
 func addCylinder(): addShape("cylinder")
+func addSphere(): addShape("sphere")
 
 func _on_btn_box_pressed() -> void: addBox()
 func _on_btn_cylinder_pressed() -> void: addCylinder()
-
+func _on_btn_sphere_pressed() -> void: addSphere()
 
 func _on_sub_viewport_container_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
@@ -95,13 +100,30 @@ var navball_dragging = false;
 func viewport_mmb_down(pos:Vector2): navball_dragging = true;
 func viewport_mmb_up(pos:Vector2): navball_dragging = false;
 func viewport_mouseMove(pos:Vector2, rel:Vector2):
-	var sensitivity = 0.01;
+	#var sensitivity = 0.01;
+	var rotation_speed = 0.3;
+	var min_pitch = -85.0;
+	var max_pitch = 85.0;
 	if navball_dragging:
-		n_cam_anchor.rotate_x(-rel.y*sensitivity);
-		n_cam_anchor.rotate_y(-rel.x*sensitivity);
-		n_cam_anchor.rotation.z = 0.0;
-func viewport_mwheel_down(pos): pass
-func viewport_mwheel_up(pos): pass
+		#n_cam_anchor.rotate_x(-rel.y*sensitivity);
+		#n_cam_anchor.rotate_y(-rel.x*sensitivity);
+		#n_cam_anchor.rotation.z = 0.0;
+				# Current rotation in degrees
+		var current_rotation = n_cam_anchor.rotation_degrees
+		var yaw = current_rotation.y - rel.x * rotation_speed
+		var pitch = current_rotation.x - rel.y * rotation_speed
+		pitch = clamp(pitch, min_pitch, max_pitch)
+		n_cam_anchor.rotation_degrees = Vector3(pitch, yaw, 0)
+		
+func viewport_mwheel_down(_pos):
+	n_cam_anchor.scale *= 1.1;
+	if(abs(n_cam_anchor.scale.x-1.0) < 0.05):
+		n_cam_anchor.scale = Vector3(1.0,1.0,1.0);
+	
+func viewport_mwheel_up(_pos):
+	n_cam_anchor.scale /= 1.1;
+	if(abs(n_cam_anchor.scale.x-1.0) < 0.05):
+		n_cam_anchor.scale = Vector3(1.0,1.0,1.0);
 
 func viewport_click(mouse_pos:Vector2):
 	print("Mouse clicked at: ", mouse_pos)
@@ -194,7 +216,9 @@ func open_inspector(shape_info):
 	inspector.show()
 	update_inspector();
 
-func close_inspector(): inspector.hide();
+func close_inspector(): 
+	inspector.hide();
+	depopulate_inspector_params();
 
 var inspector_ignore_signals = false;
 func on_inspector_changed(_dummy):
@@ -266,7 +290,6 @@ func set_shape_size(shape_info, new_size:Vector3): #unimplemented
 	pass
 
 func populate_inspector_params():
-	for ch in n_inspector_grid.get_children(): ch.queue_free()
 	var params = inspector_cur_object.generator.get_param_list();
 	for p in params:
 		var lbl = Label.new()
@@ -276,24 +299,50 @@ func populate_inspector_params():
 		if p.type == "float":
 			entry = SpinBox.new()
 			entry.step = 0.01;
-			if p.range:
-				entry.min_value = p.range[0];
-				entry.max_value = p.range[1];
-				entry.allow_greater = false;
-				entry.allow_lesser = false;
-			entry.value_changed.connect(on_inspector_changed);
-		n_inspector_grid.add_child(entry);
+		elif p.type == "int":
+			entry = SpinBox.new()
+			entry.step = 1.0;
+			entry.rounded = true;
+		elif p.type == "bool":
+			entry = CheckBox.new()
+		
+		if entry:
+			if entry is SpinBox:
+				entry.value_changed.connect(on_inspector_changed);
+				if p.range:
+					entry.min_value = p.range[0];
+					entry.max_value = p.range[1];
+					entry.allow_greater = false;
+					entry.allow_lesser = false;
+			elif entry is CheckBox:
+				entry.toggled.connect(on_inspector_changed);
+			n_inspector_grid.add_child(entry);
+
+func depopulate_inspector_params():
+	var chs = n_inspector_grid.get_children().duplicate()
+	for ch in chs: 
+		n_inspector_grid.remove_child(ch);
+		ch.queue_free();
 
 func update_inspector_params():
 	var controls = n_inspector_grid.get_children();
 	for i in range(0, len(controls)/2):
 		var lbl = controls[i*2];
 		var entry = controls[i*2+1];
-		entry.value = inspector_cur_object.generator.get_param(lbl.text);
+		var param_val = inspector_cur_object.generator.get_param(lbl.text);
+		if entry is SpinBox:
+			entry.value = param_val;
+		elif entry is CheckBox:
+			entry.button_pressed = param_val;
 
 func write_inspector_params():
 	var controls = n_inspector_grid.get_children();
 	for i in range(0, len(controls)/2):
 		var lbl = controls[i*2];
 		var entry = controls[i*2+1];
-		inspector_cur_object.generator.set_param(lbl.text, entry.value);
+		var entry_val;
+		if entry is SpinBox:
+			entry_val = entry.value;
+		elif entry is CheckBox:
+			entry_val = entry.button_pressed;
+		inspector_cur_object.generator.set_param(lbl.text, entry_val);
