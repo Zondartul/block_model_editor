@@ -11,20 +11,18 @@ func get_param_list() -> Array:
 			{"name":"z", "type":"float", "range":null}];
 
 # returns the value of a parameter
-func get_param(name:String) -> Variant:
-	return params[name];
+func get_param(param_name:String) -> Variant:
+	return params[param_name];
 
-func set_param(name:String, val:Variant) -> void:
-	params[name] = val;
+func set_param(param_name:String, val:Variant) -> void:
+	params[param_name] = val;
 	update_shapes();
 
 func gen_shapes()->void:
 	if n_vis_shape: n_vis_shape.queue_free()
 	if n_collider: n_collider.queue_free()
 	n_vis_shape = CSGBox3D.new()
-	#n_vis_shape.size = Vector3(params.x, params.y, params.z);
 	col_shape = BoxShape3D.new()
-	#col_shape.size = Vector3(params.x, params.y, params.z);
 	n_vis_shape.material = StandardMaterial3D.new()
 	n_collider = CollisionShape3D.new();
 	n_collider.shape = col_shape;

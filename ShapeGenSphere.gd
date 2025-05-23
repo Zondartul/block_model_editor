@@ -12,11 +12,11 @@ func get_param_list() -> Array:
 			{"name":"smooth", "type":"bool", "range":null}]
 			
 # returns the value of a parameter
-func get_param(name:String) -> Variant:
-	return params[name];
+func get_param(param_name:String) -> Variant:
+	return params[param_name];
 
-func set_param(name:String, val:Variant) -> void:
-	params[name] = val;
+func set_param(param_name:String, val:Variant) -> void:
+	params[param_name] = val;
 	update_shapes();
 
 func gen_shapes()->void:

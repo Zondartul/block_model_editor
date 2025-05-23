@@ -114,32 +114,32 @@ layout_mode = 2
 size_flags_horizontal = 3
 vertical = true
 
-[node name="GC" type="GridContainer" parent="BC/BC_right"]
+[node name="GC_commands" type="GridContainer" parent="BC/BC_right"]
 layout_mode = 2
 size_flags_horizontal = 3
 columns = 2
 
-[node name="btnBox" type="Button" parent="BC/BC_right/GC"]
+[node name="btnBox" type="Button" parent="BC/BC_right/GC_commands"]
 layout_mode = 2
 text = "Add box"
 
-[node name="btnCylinder" type="Button" parent="BC/BC_right/GC"]
+[node name="btnCylinder" type="Button" parent="BC/BC_right/GC_commands"]
 layout_mode = 2
 text = "Add cylinder"
 
-[node name="btnSphere" type="Button" parent="BC/BC_right/GC"]
+[node name="btnSphere" type="Button" parent="BC/BC_right/GC_commands"]
 layout_mode = 2
 text = "Add sphere"
 
-[node name="btnClear" type="Button" parent="BC/BC_right/GC"]
+[node name="btnClear" type="Button" parent="BC/BC_right/GC_commands"]
 layout_mode = 2
 text = "CLEAR"
 
-[node name="P" type="Panel" parent="BC/BC_right"]
+[node name="P_inspector" type="Panel" parent="BC/BC_right"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="BC" type="BoxContainer" parent="BC/BC_right/P"]
+[node name="BC_inspector" type="BoxContainer" parent="BC/BC_right/P_inspector"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -148,67 +148,62 @@ grow_horizontal = 2
 grow_vertical = 2
 vertical = true
 
-[node name="GC" type="GridContainer" parent="BC/BC_right/P/BC"]
+[node name="GC_insp_common" type="GridContainer" parent="BC/BC_right/P_inspector/BC_inspector"]
 layout_mode = 2
 size_flags_horizontal = 3
 columns = 2
 
-[node name="lbl1" type="Label" parent="BC/BC_right/P/BC/GC"]
+[node name="lbl1" type="Label" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 text = "Properties"
 
-[node name="Control" type="Control" parent="BC/BC_right/P/BC/GC"]
+[node name="Control" type="Control" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 
-[node name="lbl2" type="Label" parent="BC/BC_right/P/BC/GC"]
+[node name="lbl2" type="Label" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 text = "Name"
 
-[node name="lblName" type="Label" parent="BC/BC_right/P/BC/GC"]
+[node name="lblName" type="Label" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 
-[node name="lbl3" type="Label" parent="BC/BC_right/P/BC/GC"]
+[node name="lbl3" type="Label" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 text = "Color"
 
-[node name="col_picker" type="ColorPickerButton" parent="BC/BC_right/P/BC/GC"]
+[node name="col_picker" type="ColorPickerButton" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Color"
 color = Color(0.481789, 0.481789, 0.481789, 1)
 
-[node name="lbl4" type="Label" parent="BC/BC_right/P/BC/GC"]
+[node name="lbl4" type="Label" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 text = "Position"
 
-[node name="lePos" type="LineEdit" parent="BC/BC_right/P/BC/GC"]
+[node name="lePos" type="LineEdit" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 
-[node name="lbl5" type="Label" parent="BC/BC_right/P/BC/GC"]
-layout_mode = 2
-text = "Size"
-
-[node name="leSize" type="LineEdit" parent="BC/BC_right/P/BC/GC"]
-layout_mode = 2
-editable = false
-
-[node name="lbl6" type="Label" parent="BC/BC_right/P/BC/GC"]
+[node name="lbl6" type="Label" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 text = "Rotation"
 
-[node name="leRot" type="LineEdit" parent="BC/BC_right/P/BC/GC"]
+[node name="leRot" type="LineEdit" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 
-[node name="GC2" type="GridContainer" parent="BC/BC_right/P/BC"]
+[node name="GC_insp_params" type="GridContainer" parent="BC/BC_right/P_inspector/BC_inspector"]
 layout_mode = 2
 size_flags_vertical = 3
 columns = 2
 
+[node name="AcceptDialog" type="AcceptDialog" parent="."]
+initial_position = 2
+
 [connection signal="empty_clicked" from="BC/BC_left/shape_list" to="." method="_on_shape_list_empty_clicked"]
 [connection signal="item_selected" from="BC/BC_left/shape_list" to="." method="_on_shape_list_item_selected"]
 [connection signal="gui_input" from="BC/BC_center/SubViewportContainer" to="." method="_on_sub_viewport_container_gui_input"]
-[connection signal="pressed" from="BC/BC_right/GC/btnBox" to="." method="_on_btn_box_pressed"]
-[connection signal="pressed" from="BC/BC_right/GC/btnCylinder" to="." method="_on_btn_cylinder_pressed"]
-[connection signal="pressed" from="BC/BC_right/GC/btnSphere" to="." method="_on_btn_sphere_pressed"]
-[connection signal="pressed" from="BC/BC_right/GC/btnClear" to="." method="_on_btn_clear_pressed"]
+[connection signal="pressed" from="BC/BC_right/GC_commands/btnBox" to="." method="_on_btn_box_pressed"]
+[connection signal="pressed" from="BC/BC_right/GC_commands/btnCylinder" to="." method="_on_btn_cylinder_pressed"]
+[connection signal="pressed" from="BC/BC_right/GC_commands/btnSphere" to="." method="_on_btn_sphere_pressed"]
+[connection signal="pressed" from="BC/BC_right/GC_commands/btnClear" to="." method="_on_btn_clear_pressed"]
