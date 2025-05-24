@@ -2,11 +2,11 @@
 extends StaticBody3D
 @export var color:Color = Color.WHITE: 
 	set(value):
-		mat.albedo_color = value;
+		if mat: mat.albedo_color = value;
 		color = value;
-@onready var n_cube = $handle_cube
-@onready var n_ball = $handle_ball
-@onready var n_arrow = $handle_arrow
+@onready var n_cube = $shape_cube
+@onready var n_ball = $shape_ball
+@onready var n_arrow= $shape_arrow
 @onready var mat = n_cube.material #all sub-objects share the same material
 
 #shape is one of: "cube", "ball", "arrow", "none"

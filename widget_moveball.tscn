@@ -1,6 +1,7 @@
-[gd_scene load_steps=8 format=3 uid="uid://da8kfb6sr3bdw"]
+[gd_scene load_steps=9 format=3 uid="uid://da8kfb6sr3bdw"]
 
 [ext_resource type="PackedScene" uid="uid://djboaa8sovsc5" path="res://widget_handle.tscn" id="1_aivsq"]
+[ext_resource type="Script" uid="uid://bh4ky3yw5l6n7" path="res://widget_moveball.gd" id="1_qfmiw"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_aivsq"]
 albedo_color = Color(1, 0, 0, 1)
@@ -21,17 +22,16 @@ albedo_color = Color(0.53, 0.584833, 1, 0.498039)
 albedo_color = Color(1, 0.46, 0.46, 0.501961)
 
 [node name="widget_moveball" type="Node3D"]
+script = ExtResource("1_qfmiw")
 
 [node name="axis_x" type="Node3D" parent="."]
 transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="handle_A" parent="axis_x" instance=ExtResource("1_aivsq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-color = Color(1, 0, 0, 1)
 
 [node name="handle_B" parent="axis_x" instance=ExtResource("1_aivsq")]
 transform = Transform3D(-1, -8.74228e-08, 0, 8.74228e-08, -1, 0, 0, 0, 1, 0, -1, 0)
-color = Color(1, 0, 0, 1)
 
 [node name="line" type="CSGCylinder3D" parent="axis_x"]
 radius = 0.01
@@ -41,11 +41,9 @@ material = SubResource("StandardMaterial3D_aivsq")
 
 [node name="handle_A" parent="axis_y" instance=ExtResource("1_aivsq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-color = Color(0, 1, 0.0156863, 1)
 
 [node name="handle_B" parent="axis_y" instance=ExtResource("1_aivsq")]
 transform = Transform3D(-1, -8.74228e-08, 0, 8.74228e-08, -1, 0, 0, 0, 1, 0, -1, 0)
-color = Color(0, 1, 0.015625, 1)
 
 [node name="line" type="CSGCylinder3D" parent="axis_y"]
 radius = 0.01
@@ -56,11 +54,9 @@ transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 
 
 [node name="handle_A" parent="axis_z" instance=ExtResource("1_aivsq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-color = Color(0, 0.109804, 1, 1)
 
 [node name="handle_B" parent="axis_z" instance=ExtResource("1_aivsq")]
 transform = Transform3D(-1, -8.74228e-08, 0, 8.74228e-08, -1, 0, 0, 0, 1, 0, -1, 0)
-color = Color(0, 0.109375, 1, 1)
 
 [node name="line" type="CSGCylinder3D" parent="axis_z"]
 radius = 0.01
