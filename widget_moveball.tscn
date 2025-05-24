@@ -1,0 +1,105 @@
+[gd_scene load_steps=8 format=3 uid="uid://da8kfb6sr3bdw"]
+
+[ext_resource type="PackedScene" uid="uid://djboaa8sovsc5" path="res://widget_handle.tscn" id="1_aivsq"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_aivsq"]
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qfmiw"]
+albedo_color = Color(0.171875, 1, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ciyer"]
+albedo_color = Color(0, 0.3, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2h40w"]
+albedo_color = Color(0.541667, 1, 0.45, 0.552941)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8y5l4"]
+albedo_color = Color(0.53, 0.584833, 1, 0.498039)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kb0r2"]
+albedo_color = Color(1, 0.46, 0.46, 0.501961)
+
+[node name="widget_moveball" type="Node3D"]
+
+[node name="axis_x" type="Node3D" parent="."]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="handle_A" parent="axis_x" instance=ExtResource("1_aivsq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+color = Color(1, 0, 0, 1)
+
+[node name="handle_B" parent="axis_x" instance=ExtResource("1_aivsq")]
+transform = Transform3D(-1, -8.74228e-08, 0, 8.74228e-08, -1, 0, 0, 0, 1, 0, -1, 0)
+color = Color(1, 0, 0, 1)
+
+[node name="line" type="CSGCylinder3D" parent="axis_x"]
+radius = 0.01
+material = SubResource("StandardMaterial3D_aivsq")
+
+[node name="axis_y" type="Node3D" parent="."]
+
+[node name="handle_A" parent="axis_y" instance=ExtResource("1_aivsq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+color = Color(0, 1, 0.0156863, 1)
+
+[node name="handle_B" parent="axis_y" instance=ExtResource("1_aivsq")]
+transform = Transform3D(-1, -8.74228e-08, 0, 8.74228e-08, -1, 0, 0, 0, 1, 0, -1, 0)
+color = Color(0, 1, 0.015625, 1)
+
+[node name="line" type="CSGCylinder3D" parent="axis_y"]
+radius = 0.01
+material = SubResource("StandardMaterial3D_qfmiw")
+
+[node name="axis_z" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+
+[node name="handle_A" parent="axis_z" instance=ExtResource("1_aivsq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+color = Color(0, 0.109804, 1, 1)
+
+[node name="handle_B" parent="axis_z" instance=ExtResource("1_aivsq")]
+transform = Transform3D(-1, -8.74228e-08, 0, 8.74228e-08, -1, 0, 0, 0, 1, 0, -1, 0)
+color = Color(0, 0.109375, 1, 1)
+
+[node name="line" type="CSGCylinder3D" parent="axis_z"]
+radius = 0.01
+material = SubResource("StandardMaterial3D_ciyer")
+
+[node name="ring_zx" type="CSGCylinder3D" parent="."]
+radius = 1.05
+height = 0.01
+sides = 32
+material = SubResource("StandardMaterial3D_2h40w")
+
+[node name="hole" type="CSGCylinder3D" parent="ring_zx"]
+operation = 2
+radius = 0.95
+height = 0.02
+sides = 32
+
+[node name="ring_xy" type="CSGCylinder3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+radius = 1.05
+height = 0.01
+sides = 32
+material = SubResource("StandardMaterial3D_8y5l4")
+
+[node name="hole" type="CSGCylinder3D" parent="ring_xy"]
+operation = 2
+radius = 0.95
+height = 0.02
+sides = 32
+
+[node name="ring_zy" type="CSGCylinder3D" parent="."]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+radius = 1.05
+height = 0.01
+sides = 32
+material = SubResource("StandardMaterial3D_kb0r2")
+
+[node name="hole" type="CSGCylinder3D" parent="ring_zy"]
+operation = 2
+radius = 0.95
+height = 0.02
+sides = 32

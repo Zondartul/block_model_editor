@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://b7s3y7kocru08"]
+[gd_scene load_steps=9 format=3 uid="uid://b7s3y7kocru08"]
 
 [ext_resource type="Script" uid="uid://ccp76xtdaxhfo" path="res://main.gd" id="1_ig7tw"]
 
@@ -14,13 +14,6 @@ background_mode = 2
 sky = SubResource("Sky_0xm2m")
 tonemap_mode = 2
 glow_enabled = true
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7dm0k"]
-albedo_color = Color(0.628358, 0.68742, 0.108291, 1)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ig7tw"]
-shading_mode = 0
-disable_receive_shadows = true
 
 [sub_resource type="Gradient" id="Gradient_ig7tw"]
 offsets = PackedFloat32Array(0, 0.440298, 0.447761, 0.522388, 0.962687, 1)
@@ -87,16 +80,6 @@ size = Vector2i(687, 648)
 render_target_update_mode = 4
 
 [node name="Scene3D" type="Node3D" parent="BC/BC_center/SubViewportContainer/SubViewport"]
-
-[node name="CSGBox3D" type="CSGBox3D" parent="BC/BC_center/SubViewportContainer/SubViewport/Scene3D"]
-visible = false
-material = SubResource("StandardMaterial3D_7dm0k")
-
-[node name="CSGBox3D2" type="CSGBox3D" parent="BC/BC_center/SubViewportContainer/SubViewport/Scene3D"]
-transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
-visible = false
-flip_faces = true
-material = SubResource("StandardMaterial3D_ig7tw")
 
 [node name="CSGBox3D3" type="CSGBox3D" parent="BC/BC_center/SubViewportContainer/SubViewport/Scene3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0848999, -0.672178, -0.104065)
