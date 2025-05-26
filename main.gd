@@ -1,9 +1,9 @@
 extends Control
 
 var shapes = []
-var gizmo_anchor = null
-var mat_outline = null
 var inspector_cur_object = null
+var selection_gizmo;
+var mouseover_gizmo;
 
 # need to preload my classes so Godot registers them as types
 # note: const ShapeGenerator = preload(...) -> warning "constant has same name as global class"
@@ -13,6 +13,8 @@ const class_ShapeGenerator = preload("res://ShapeGen.gd");
 const class_ShapeGenBox = preload("res://ShapeGenBox.gd");
 const class_ShapeGenCylinder = preload("res://ShapeGenCylinder.gd");
 const class_ShapeGenSphere = preload("res://ShapeGenSphere.gd");
+
+const script_gizmo_outline = preload("res://gizmo_outline.gd");
 
 @onready var scene = $BC/BC_center/SubViewportContainer/SubViewport/Scene3D
 @onready var shape_list = $BC/BC_left/shape_list
@@ -25,12 +27,11 @@ const class_ShapeGenSphere = preload("res://ShapeGenSphere.gd");
 signal mouseover_3d_changed(new_mouseover_3d:Dictionary)
 
 func _ready():
-	# generate a material for selected object outline
-	mat_outline = StandardMaterial3D.new()
-	mat_outline.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED; 
 	# initialize inspector panel
 	register_inspector();
-	
+	selection_gizmo = script_gizmo_outline.new()
+	mouseover_gizmo = script_gizmo_outline.new()
+	mouseover_gizmo.thickness = 1.1;
 
 func error(msg:String, show_popup:bool=true, push:bool=true):
 	printerr(msg)
@@ -135,7 +136,7 @@ func viewport_mwheel_up(_pos):
 	if abs(cam_zoom-1.0)<0.05: cam_zoom = 1.0; # snap to correct for accumulating floating-point error
 	n_cam_anchor.scale = Vector3.ONE / cam_zoom;
 
-var mouseover_3d = {"obj":null, "sub_obj":null, "shape_info":null, "name":null, "collider":null, "pos":null};
+var mouseover_3d = {"obj":null, "sub_obj":null, "shape_info":null, "name":null, "pos":null};
 func clear_mouseover_3d(): for k in mouseover_3d: mouseover_3d[k] = null;
 
 func update_3d_mouseover(mouse_pos:Vector2):
@@ -150,20 +151,29 @@ func update_3d_mouseover(mouse_pos:Vector2):
 	if hit:
 		#print("hit "+hit.collider.name)
 		var shape_info = get_shape_info_collider(hit.collider)
+		mouseover_3d.obj = hit.collider;
 		if shape_info:
-			#print("this is ["+shape_info.body.name+"]")
 			mouseover_3d.shape_info = shape_info;
-			mouseover_3d.obj = shape_info.body;
-			mouseover_3d.collider = hit.collider;
+			#mouseover_3d.obj = shape_info.body;
+			#mouseover_3d.collider = hit.collider;
 			#shape_click(shape_info);
-		elif n_widget_moveball.visible and n_widget_moveball.is_ancestor_of(hit.collider):
-			#print("hit moveball")
-			mouseover_3d.obj = n_widget_moveball;
-			mouseover_3d.sub_obj = hit.collider.get_parent();
-			mouseover_3d.collider = hit.collider;
+		#elif n_widget_moveball.visible and n_widget_moveball.is_ancestor_of(hit.collider):
+			#mouseover_3d.obj = n_widget_moveball;
+			#mouseover_3d.sub_obj = hit.collider.get_parent();
+			#mouseover_3d.collider = hit.collider;
 		# if collider is not from a recognized body, do not record it.
 	if not dicts_equal(old_mouseover_3d, mouseover_3d):
 		mouseover_3d_changed.emit(mouseover_3d.duplicate())
+		if mouseover_3d.obj:
+			var shape_info2 = mouseover_3d.shape_info;
+			if not shape_info2:
+				var body = hit.collider;
+				var vis_shape = body.vis_shape;
+				assert(vis_shape);
+				shape_info2 = {"body":body, "vis_shape":vis_shape};
+			mouseover_gizmo.attach(shape_info2);
+		else:
+			mouseover_gizmo.detach();
 		#print("new mouseover: "+str(mouseover_3d))
 		#else:
 			#print("not ours")
@@ -213,35 +223,17 @@ func void_click():
 	deselect_shape();
 	
 func deselect_shape():
-	remove_gizmo();
+	#remove_gizmo();
+	
 	n_widget_moveball.hide();
 	shape_list.deselect_all();
 	close_inspector();
 	inspector_cur_object = null;
-	
-func remove_gizmo():
-	if gizmo_anchor:
-		gizmo_anchor.queue_free()
-	gizmo_anchor = null
 
-func apply_gizmo(shape_info):
-	remove_gizmo();
-	var vis_shape:Node3D = shape_info.vis_shape;
-	var gizmo = vis_shape.duplicate();
-	gizmo.scale *= 1.05;
-	gizmo.material = mat_outline;
-	gizmo.flip_faces = true;
-	gizmo_anchor = Node3D.new();
-	gizmo_anchor.add_child(gizmo);
-	shape_info.body.add_child(gizmo_anchor);
 
-func reapply_gizmo():
-	var shape = inspector_cur_object;
-	remove_gizmo();
-	if shape: apply_gizmo(shape);
 
 func select_shape(shape_info):
-	apply_gizmo(shape_info)
+	selection_gizmo.attach(shape_info); #apply_gizmo(shape_info)
 	n_widget_moveball.mode = "move_idle";
 	n_widget_moveball.position = shape_info.body.position;
 	n_widget_moveball.show();
@@ -273,7 +265,7 @@ func on_inspector_changed(_dummy):
 	print("inspector changed");
 	write_inspector();
 	update_inspector();
-	reapply_gizmo();
+	selection_gizmo.update(); #reapply_gizmo();
 
 func register_inspector():
 	var col_picker:ColorPickerButton = inspector.find_child("col_picker");
