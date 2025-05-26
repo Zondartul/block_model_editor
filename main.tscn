@@ -1,6 +1,7 @@
-[gd_scene load_steps=11 format=3 uid="uid://b7s3y7kocru08"]
+[gd_scene load_steps=10 format=3 uid="uid://b7s3y7kocru08"]
 
 [ext_resource type="Script" uid="uid://ccp76xtdaxhfo" path="res://main.gd" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://da8kfb6sr3bdw" path="res://widget_moveball.tscn" id="2_0xm2m"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ig7tw"]
 sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
@@ -14,13 +15,6 @@ background_mode = 2
 sky = SubResource("Sky_0xm2m")
 tonemap_mode = 2
 glow_enabled = true
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7dm0k"]
-albedo_color = Color(0.628358, 0.68742, 0.108291, 1)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ig7tw"]
-shading_mode = 0
-disable_receive_shadows = true
 
 [sub_resource type="Gradient" id="Gradient_ig7tw"]
 offsets = PackedFloat32Array(0, 0.440298, 0.447761, 0.522388, 0.962687, 1)
@@ -88,16 +82,6 @@ render_target_update_mode = 4
 
 [node name="Scene3D" type="Node3D" parent="BC/BC_center/SubViewportContainer/SubViewport"]
 
-[node name="CSGBox3D" type="CSGBox3D" parent="BC/BC_center/SubViewportContainer/SubViewport/Scene3D"]
-visible = false
-material = SubResource("StandardMaterial3D_7dm0k")
-
-[node name="CSGBox3D2" type="CSGBox3D" parent="BC/BC_center/SubViewportContainer/SubViewport/Scene3D"]
-transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
-visible = false
-flip_faces = true
-material = SubResource("StandardMaterial3D_ig7tw")
-
 [node name="CSGBox3D3" type="CSGBox3D" parent="BC/BC_center/SubViewportContainer/SubViewport/Scene3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0848999, -0.672178, -0.104065)
 size = Vector3(3.29504, 0.307129, 4.21277)
@@ -108,6 +92,9 @@ material = SubResource("StandardMaterial3D_1bvp3")
 [node name="Camera3D" type="Camera3D" parent="BC/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor"]
 transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 1, 2)
 current = true
+
+[node name="widget_moveball" parent="BC/BC_center/SubViewportContainer/SubViewport/Scene3D" instance=ExtResource("2_0xm2m")]
+visible = false
 
 [node name="BC_right" type="BoxContainer" parent="BC"]
 layout_mode = 2

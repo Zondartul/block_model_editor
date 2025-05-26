@@ -1,0 +1,39 @@
+[gd_scene load_steps=4 format=3 uid="uid://djboaa8sovsc5"]
+
+[ext_resource type="Script" uid="uid://dujudw7ikvymj" path="res://widget_handle.gd" id="1_q7uc4"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_nv17g"]
+radius = 0.0971828
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_new0h"]
+resource_local_to_scene = true
+albedo_color = Color(1, 0, 0, 1)
+
+[node name="widget_handle" type="StaticBody3D"]
+script = ExtResource("1_q7uc4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_nv17g")
+
+[node name="shape_cube" type="CSGBox3D" parent="."]
+visible = false
+size = Vector3(0.1, 0.1, 0.1)
+material = SubResource("StandardMaterial3D_new0h")
+
+[node name="shape_ball" type="CSGSphere3D" parent="."]
+visible = false
+radius = 0.07
+material = SubResource("StandardMaterial3D_new0h")
+
+[node name="shape_arrow" type="CSGCylinder3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
+radius = 0.025
+height = 0.1
+material = SubResource("StandardMaterial3D_new0h")
+
+[node name="cone" type="CSGCylinder3D" parent="shape_arrow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+radius = 0.05
+height = 0.15
+cone = true
+material = SubResource("StandardMaterial3D_new0h")
