@@ -98,14 +98,14 @@ func _on_sub_viewport_container_gui_input(event: InputEvent) -> void:
 				MOUSE_BUTTON_MIDDLE: viewport_mmb_up(event.position);
 				_: pass; # ignore other buttons		
 	elif event is InputEventMouseMotion:
-		viewport_mouseMove(event.position, event.relative);
+		viewport_mouse_move(event.position, event.relative);
 
 var navball_dragging = false;
 @onready var n_cam_anchor = $BC/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor
 # mouse position argument is unneeded now, but most mouse-based tools will use it.
 func viewport_mmb_down(_pos:Vector2): navball_dragging = true;
 func viewport_mmb_up(_pos:Vector2): navball_dragging = false;
-func viewport_mouseMove(pos:Vector2, rel:Vector2):
+func viewport_mouse_move(pos:Vector2, rel:Vector2):
 	orbit_camera(rel);
 	update_3d_mouseover(pos);
 

@@ -16,10 +16,12 @@ script = ExtResource("1_q7uc4")
 shape = SubResource("SphereShape3D_nv17g")
 
 [node name="shape_cube" type="CSGBox3D" parent="."]
+visible = false
 size = Vector3(0.1, 0.1, 0.1)
 material = SubResource("StandardMaterial3D_new0h")
 
 [node name="shape_ball" type="CSGSphere3D" parent="."]
+visible = false
 radius = 0.07
 material = SubResource("StandardMaterial3D_new0h")
 

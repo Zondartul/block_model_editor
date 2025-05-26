@@ -9,7 +9,7 @@ extends Node3D
 @onready var nodes = [axis_x, axis_y, axis_z, ring_zy, ring_zx, ring_xy];
 @onready var handles = find_children("handle_*");
 
-var mode:String = "move_idle":
+var mode:String:
 	set(new_mode):
 		if not new_mode in vis_configs: push_error("widget_moveball: set_mode: unknown mode"); return;
 		mode = new_mode;
@@ -19,7 +19,7 @@ var mode:String = "move_idle":
 
 const vis_configs = {
 	# config_name : [ handle_style, node_visible: x, y, z, zy, zx, xy ]
-	"none": 		["none", 	0,0,0,0,0,0],
+	"none": 		["arrow", 	0,0,0,0,0,0], #default handle shape, it's invisible anyway
 	
 	"move_idle":	["arrow",	1,1,1,0,0,0],
 	"move_x":		["arrow",	1,0,0,0,0,0],
@@ -38,11 +38,12 @@ const vis_configs = {
 }
 
 func _ready():
-	pass
+	mode = "move_idle";
 
 func next_mode():
 	var new_mode;
 	if   mode.begins_with("move_"): new_mode = "rotate_idle";
 	elif mode.begins_with("rotate_"): new_mode = "scale_idle";
 	elif mode.begins_with("scale_"): new_mode = "move_idle";
+	else: new_mode = "move_idle";
 	mode = new_mode;
