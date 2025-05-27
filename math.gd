@@ -3,7 +3,9 @@ extends Node
 class Ray:
 	var orig:Vector3
 	var dir:Vector3
-	
+	func _to_string()->String:
+		return str(orig)+"->"+str(dir);
+
 static func line_to_line_closest_point(ray_A:Ray, ray_B:Ray):	
 	var P0 = ray_A.orig;
 	var w0 = ray_B.orig - ray_A.orig;

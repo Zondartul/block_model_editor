@@ -84,21 +84,71 @@ func _on_btn_box_pressed() -> void: addBox()
 func _on_btn_cylinder_pressed() -> void: addCylinder()
 func _on_btn_sphere_pressed() -> void: addSphere()
 
+func is_actual_mouse_button_down(event:InputEvent)->bool:
+	const actual_mouse_buttons = [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_MIDDLE, MOUSE_BUTTON_RIGHT];
+	return (event is InputEventMouseButton)\
+		and (event.pressed)\
+		and (event.button_index in actual_mouse_buttons);
+
+func is_tracked_mouse_button_released(event, tracked_button):
+	return (event is InputEventMouseButton)\
+		and (not event.pressed)\
+		and (event.button_index == tracked_button);
+
+func get_interfaceable_object()->IfxMouse3D:
+	if (mouseover_3d.obj) and ("ifx_mouse_3d" in mouseover_3d.obj):
+		return mouseover_3d.obj.ifx_mouse_3d;
+	return null;
+
+var tracked_object = null;
+var mouse_down_index = 0;
+# 3D interaction logic:
+# -- if we press on something, it keeps receiving events until we release
+# -- otherwise, send events to anything we pass over
+func try_deliver_event_to_3d(event: InputEvent)->bool:
+	var is_handled = false;
+	if tracked_object:
+		is_handled = deliver_event_to_object(event, tracked_object); # all events later for tracked obj
+		if is_tracked_mouse_button_released(event, mouse_down_index):
+			tracked_object = null
+			mouse_down_index = null;
+			print("stopped tracking")
+	else:
+		var obj = get_interfaceable_object();
+		if obj:
+			if is_actual_mouse_button_down(event):
+				tracked_object = obj;
+				mouse_down_index = event.button_index;
+				print("started tracking "+tracked_object.name);
+			is_handled = deliver_event_to_object(event, obj); # all events now for any obj
+	return is_handled;
+
+func deliver_event_to_object(event:InputEvent, obj:IfxMouse3D)->bool:
+	# translate event
+	var ray = Math.Ray.new();
+	var rel_ray = Math.Ray.new();
+	if "position" in event: ray = mouse_pos_to_ray(event.position);
+	if "rel" in event: rel_ray = mouse_pos_to_ray(event.position + event.rel) - ray;
+	var is_handled = obj.on_event(event, ray, rel_ray);
+	return is_handled;
+
 func _on_sub_viewport_container_gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton:
-		if event.pressed:
-			match event.button_index:
-				MOUSE_BUTTON_LEFT: viewport_click(event.position);
-				MOUSE_BUTTON_MIDDLE: viewport_mmb_down(event.position);
-				MOUSE_BUTTON_WHEEL_DOWN: viewport_mwheel_down(event.position);
-				MOUSE_BUTTON_WHEEL_UP: viewport_mwheel_up(event.position);
-				_: pass; # ignore other buttons
-		else:
-			match event.button_index:
-				MOUSE_BUTTON_MIDDLE: viewport_mmb_up(event.position);
-				_: pass; # ignore other buttons		
-	elif event is InputEventMouseMotion:
-		viewport_mouse_move(event.position, event.relative);
+	var handled = try_deliver_event_to_3d(event);
+	if not handled:
+		if event is InputEventMouseButton:
+			if event.pressed:
+				match event.button_index:
+					MOUSE_BUTTON_LEFT: viewport_click(event.position);
+					MOUSE_BUTTON_MIDDLE: viewport_mmb_down(event.position);
+					MOUSE_BUTTON_WHEEL_DOWN: viewport_mwheel_down(event.position);
+					MOUSE_BUTTON_WHEEL_UP: viewport_mwheel_up(event.position);
+					_: pass; # ignore other buttons
+			else:
+				match event.button_index:
+					MOUSE_BUTTON_MIDDLE: viewport_mmb_up(event.position);
+					_: pass; # ignore other buttons		
+		elif event is InputEventMouseMotion:
+			viewport_mouse_move(event.position, event.relative);
 
 var navball_dragging = false;
 @onready var n_cam_anchor = $BC/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor
@@ -139,29 +189,30 @@ func viewport_mwheel_up(_pos):
 var mouseover_3d = {"obj":null, "sub_obj":null, "shape_info":null, "name":null, "pos":null};
 func clear_mouseover_3d(): for k in mouseover_3d: mouseover_3d[k] = null;
 
+func mouse_pos_to_ray(mouse_pos:Vector2) -> Math.Ray:
+	var ray_origin = camera.project_ray_origin(mouse_pos)
+	var ray_dir = camera.project_ray_normal(mouse_pos)
+	var ray = Math.Ray.new();
+	ray.orig = ray_origin;
+	ray.dir = ray_dir;
+	return ray;
+
+func ray_query(ray:Math.Ray):
+	var space_state = camera.get_world_3d().direct_space_state
+	var ray_query = PhysicsRayQueryParameters3D.create(ray.orig, ray.orig + ray.dir * 1000.0)
+	var hit = space_state.intersect_ray(ray_query)
+	return hit;
+
 func update_3d_mouseover(mouse_pos:Vector2):
 	var old_mouseover_3d = mouseover_3d.duplicate();
 	clear_mouseover_3d();
-	var ray_origin = camera.project_ray_origin(mouse_pos)
-	var ray_dir = camera.project_ray_normal(mouse_pos)
-	#print("Ray origin: ", ray_origin, " | Direction: ", ray_dir)
-	var space_state = camera.get_world_3d().direct_space_state
-	var ray_query = PhysicsRayQueryParameters3D.create(ray_origin, ray_origin + ray_dir * 1000.0)
-	var hit = space_state.intersect_ray(ray_query)
+	var ray = mouse_pos_to_ray(mouse_pos);
+	var hit = ray_query(ray);
 	if hit:
-		#print("hit "+hit.collider.name)
 		var shape_info = get_shape_info_collider(hit.collider)
 		mouseover_3d.obj = hit.collider;
 		if shape_info:
 			mouseover_3d.shape_info = shape_info;
-			#mouseover_3d.obj = shape_info.body;
-			#mouseover_3d.collider = hit.collider;
-			#shape_click(shape_info);
-		#elif n_widget_moveball.visible and n_widget_moveball.is_ancestor_of(hit.collider):
-			#mouseover_3d.obj = n_widget_moveball;
-			#mouseover_3d.sub_obj = hit.collider.get_parent();
-			#mouseover_3d.collider = hit.collider;
-		# if collider is not from a recognized body, do not record it.
 	if not dicts_equal(old_mouseover_3d, mouseover_3d):
 		mouseover_3d_changed.emit(mouseover_3d.duplicate())
 		if mouseover_3d.obj:
@@ -174,13 +225,6 @@ func update_3d_mouseover(mouse_pos:Vector2):
 			mouseover_gizmo.attach(shape_info2);
 		else:
 			mouseover_gizmo.detach();
-		#print("new mouseover: "+str(mouseover_3d))
-		#else:
-			#print("not ours")
-			#void_click();
-	#else:
-		#print("no hit")
-		#void_click();
 
 func dicts_equal(dict_A:Dictionary, dict_B:Dictionary):
 	return dict_A.hash() == dict_B.hash()
@@ -190,7 +234,7 @@ func viewport_click(mouse_pos:Vector2):
 	update_3d_mouseover(mouse_pos);
 	if mouseover_3d.shape_info: shape_click(mouseover_3d.shape_info);
 	else: void_click();
-
+	
 func get_shape_info_collider(collider):
 	for shape_info in shapes:
 		if(shape_info.body == collider):
@@ -223,14 +267,10 @@ func void_click():
 	deselect_shape();
 	
 func deselect_shape():
-	#remove_gizmo();
-	
 	n_widget_moveball.hide();
 	shape_list.deselect_all();
 	close_inspector();
 	inspector_cur_object = null;
-
-
 
 func select_shape(shape_info):
 	selection_gizmo.attach(shape_info); #apply_gizmo(shape_info)

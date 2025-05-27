@@ -10,6 +10,8 @@ extends StaticBody3D
 @onready var n_ball = $shape_ball
 @onready var n_arrow= $shape_arrow
 @onready var mat = n_cube.material #all sub-objects share the same material
+@onready var ifx_mouse_3d = $mouse_handler #externally referenced
+
 var vis_shape;
 var shape:String;
 

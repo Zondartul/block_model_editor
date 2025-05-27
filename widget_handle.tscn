@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://djboaa8sovsc5"]
+[gd_scene load_steps=5 format=3 uid="uid://djboaa8sovsc5"]
 
 [ext_resource type="Script" uid="uid://dujudw7ikvymj" path="res://widget_handle.gd" id="1_q7uc4"]
+[ext_resource type="Script" uid="uid://dii7amubsd0kq" path="res://moveball_handle_ifx_mouse_3d.gd" id="2_new0h"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_nv17g"]
 radius = 0.0971828
@@ -37,3 +38,6 @@ radius = 0.05
 height = 0.15
 cone = true
 material = SubResource("StandardMaterial3D_new0h")
+
+[node name="mouse_handler" type="Node3D" parent="."]
+script = ExtResource("2_new0h")
