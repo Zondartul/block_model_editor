@@ -16,13 +16,13 @@ const class_ShapeGenSphere = preload("res://ShapeGenSphere.gd");
 
 const script_gizmo_outline = preload("res://gizmo_outline.gd");
 
-@onready var scene = $BC/BC_center/SubViewportContainer/SubViewport/Scene3D
-@onready var shape_list = $BC/BC_left/shape_list
-@onready var camera = $BC/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor/Camera3D
-@onready var inspector = $BC/BC_right/P_inspector
-@onready var n_inspector_grid = $BC/BC_right/P_inspector/BC_inspector/GC_insp_params
+@onready var scene = $BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D
+@onready var shape_list = $BC/BC_middle/BC_left/shape_list
+@onready var camera = $BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor/Camera3D
+@onready var inspector = $BC/BC_middle/BC_right/P_inspector
+@onready var n_inspector_grid = $BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_params
 #widgets
-@onready var n_widget_moveball = $BC/BC_center/SubViewportContainer/SubViewport/Scene3D/widget_moveball
+@onready var n_widget_moveball = $BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D/widget_moveball
 
 signal mouseover_3d_changed(new_mouseover_3d:Dictionary)
 
@@ -33,19 +33,23 @@ func _ready():
 	mouseover_gizmo = script_gizmo_outline.new()
 	mouseover_gizmo.thickness = 1.1;
 
-func error(msg:String, show_popup:bool=true, push:bool=true):
+func error(msg:String, _show_popup:bool=true, push:bool=true):
 	printerr(msg)
 	if push: push_error(msg);
-	if show_popup: show_error(msg);
+	if _show_popup: show_error(msg);
 
-func show_error(msg:String):
+func show_popup(msg:String, title:String):
 	var pop = AcceptDialog.new();
-	pop.title = "Error";
+	pop.title = title;
 	pop.initial_position = Window.WINDOW_INITIAL_POSITION_CENTER_MAIN_WINDOW_SCREEN;
 	pop.dialog_text = msg;
 	pop.close_requested.connect(pop.queue_free);
 	get_tree().root.add_child(pop);
 	pop.show()
+	return pop;
+
+func show_error(msg:String):
+	show_popup(msg, "Error")
 
 func create_body(type:String):
 	var body = StaticBody3D.new()
@@ -69,6 +73,7 @@ func addShape(type):
 	scene.add_child(shape_info.body)
 	update_shape_list()
 	print("added "+type)
+	on_project_changed();
 
 func update_shape_list():
 	shape_list.clear()
@@ -101,7 +106,7 @@ func _on_sub_viewport_container_gui_input(event: InputEvent) -> void:
 		viewport_mouse_move(event.position, event.relative);
 
 var navball_dragging = false;
-@onready var n_cam_anchor = $BC/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor
+@onready var n_cam_anchor = $BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor
 # mouse position argument is unneeded now, but most mouse-based tools will use it.
 func viewport_mmb_down(_pos:Vector2): navball_dragging = true;
 func viewport_mmb_up(_pos:Vector2): navball_dragging = false;
@@ -204,6 +209,9 @@ func get_shape_info_idx(idx):
 	return null
 
 func _on_btn_clear_pressed() -> void:
+	clear_workspace();
+
+func clear_workspace():
 	deselect_shape();
 	for shape_info in shapes:
 		shape_info.body.queue_free()
@@ -266,6 +274,7 @@ func on_inspector_changed(_dummy):
 	write_inspector();
 	update_inspector();
 	selection_gizmo.update(); #reapply_gizmo();
+	on_project_changed();
 
 func register_inspector():
 	var col_picker:ColorPickerButton = inspector.find_child("col_picker");
@@ -390,3 +399,118 @@ func write_inspector_params():
 				close_inspector();
 				return;
 		inspector_cur_object.generator.set_param(param_name, entry_val);
+
+# Feature-File state
+const cur_file_default = {"filename":"", "is_open":false, "is_dirty":false}
+var cur_file = cur_file_default.duplicate();
+
+const MENU_BTN_FILE_NEW = 0
+const MENU_BTN_FILE_OPEN = 1
+const MENU_BTN_FILE_SAVE = 2
+const MENU_BTN_FILE_SAVE_AS = 3
+@onready var n_FD:FileDialog = $FileDialog
+const class_Promise = preload("res://Promise.gd")
+# for MenuBar - File menu
+func _on_file_id_pressed(id: int) -> void:
+	match id:
+		MENU_BTN_FILE_NEW: NewFile();
+		MENU_BTN_FILE_OPEN: OpenFile();
+		MENU_BTN_FILE_SAVE: SaveFile();
+		MENU_BTN_FILE_SAVE_AS: SaveFileAs();
+
+func NewFile():
+	var go = await clear_dirty_file();
+	if not go: return;
+	clear_workspace();
+	cur_file = cur_file_default.duplicate()
+	update_file_dirty_indicator()
+
+func OpenFile():
+	var go = await clear_dirty_file();
+	if not go: return;
+	n_FD.file_mode = n_FD.FILE_MODE_OPEN_FILE;
+	n_FD.title = "Open File"
+	n_FD.show()
+	var res = await Promise.new(n_FD.file_selected)._else(n_FD.canceled, 0).wait();
+	if res.success:
+		OpenFileActual(res.data);
+	else:
+		print("no file selected")
+		return;
+		
+func OpenFileActual(filename):
+	print("open the file "+str(filename))
+	cur_file.filename = filename;
+	cur_file.is_open = true;
+	var file = FileAccess.open(filename, FileAccess.READ);
+	if(file):
+		var data = file.get_as_text()
+		DeserializeProject(data);
+	else:
+		push_error("Can't open file for reading: "+str(FileAccess.get_open_error()))
+	cur_file.is_dirty = false;
+	update_file_dirty_indicator()
+	
+func SaveFile():
+	if cur_file.filename == "":
+		SaveFileAs();
+	else:
+		SaveFileActual(cur_file.filename);
+
+func SaveFileActual(filename):
+	print("save the file "+str(filename))
+	cur_file.filename = filename;
+	cur_file.is_open = true;
+	var file = FileAccess.open(filename, FileAccess.WRITE);
+	if(file):
+		var data = SerializeProject();
+		file.store_string(data);
+	else:
+		push_error("Can't open file for writing: "+str(FileAccess.get_open_error()))
+		return false;
+	cur_file.is_dirty = false;
+	update_file_dirty_indicator()
+	return true;
+
+func SaveFileAs():
+	n_FD.file_mode = n_FD.FILE_MODE_SAVE_FILE;
+	n_FD.title = "Save File"
+	n_FD.show()
+	var res = await Promise.new(n_FD.file_selected)._else(n_FD.canceled, 0).wait();
+	if res.success:
+		return SaveFileActual(res.data);
+	else:
+		print("no file selected")
+		return false;
+
+# if the current file has unsaved changes, asks the user to save them.
+# returns true when it is safe to proceed.
+# returns false if the user cancels.
+func clear_dirty_file():
+	if cur_file.is_dirty:
+		var pop = show_popup("Current file has changes, save it?", "Warning");
+		var res = await Promise.new(pop.confirmed,0)._else(pop.canceled,0).wait();
+		if res.success:	return await SaveFile();
+		else:			return false;
+	else:
+		return true;
+
+func on_project_changed():
+	cur_file.is_dirty = true;
+	update_file_dirty_indicator()
+
+func update_file_dirty_indicator():
+	var n_mb = $BC/PC_menu/MenuBar
+	var title = "File";
+	if cur_file.is_dirty: title += "*";
+	n_mb.set_menu_title(0,title);
+	n_mb.hide()
+	n_mb.show()
+
+func DeserializeProject(data:String)->void:
+	push_warning("Warning: dummy func");
+	print(data);
+
+func SerializeProject()->String:
+	push_warning("Warning: dummy func");
+	return "<dummy data>";

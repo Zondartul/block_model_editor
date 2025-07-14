@@ -1,7 +1,8 @@
-[gd_scene load_steps=10 format=3 uid="uid://b7s3y7kocru08"]
+[gd_scene load_steps=11 format=3 uid="uid://b7s3y7kocru08"]
 
 [ext_resource type="Script" uid="uid://ccp76xtdaxhfo" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://da8kfb6sr3bdw" path="res://widget_moveball.tscn" id="2_0xm2m"]
+[ext_resource type="Script" uid="uid://divvas0upohx5" path="res://todo.gd" id="3_h2yge"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ig7tw"]
 sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
@@ -56,77 +57,99 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+vertical = true
 
-[node name="BC_left" type="BoxContainer" parent="BC"]
+[node name="PC_menu" type="PanelContainer" parent="BC"]
+layout_mode = 2
+
+[node name="MenuBar" type="MenuBar" parent="BC/PC_menu"]
+layout_mode = 2
+
+[node name="File" type="PopupMenu" parent="BC/PC_menu/MenuBar"]
+item_count = 4
+item_0/text = "New"
+item_0/id = 0
+item_1/text = "Open"
+item_1/id = 1
+item_2/text = "Save"
+item_2/id = 2
+item_3/text = "Save As..."
+item_3/id = 3
+
+[node name="BC_middle" type="BoxContainer" parent="BC"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BC_left" type="BoxContainer" parent="BC/BC_middle"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="shape_list" type="ItemList" parent="BC/BC_left"]
+[node name="shape_list" type="ItemList" parent="BC/BC_middle/BC_left"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="BC_center" type="BoxContainer" parent="BC"]
+[node name="BC_center" type="BoxContainer" parent="BC/BC_middle"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 3.0
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="BC/BC_center"]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="BC/BC_middle/BC_center"]
 layout_mode = 2
 size_flags_horizontal = 3
 stretch = true
 
-[node name="SubViewport" type="SubViewport" parent="BC/BC_center/SubViewportContainer"]
+[node name="SubViewport" type="SubViewport" parent="BC/BC_middle/BC_center/SubViewportContainer"]
 handle_input_locally = false
-size = Vector2i(687, 648)
+size = Vector2i(687, 613)
 render_target_update_mode = 4
 
-[node name="Scene3D" type="Node3D" parent="BC/BC_center/SubViewportContainer/SubViewport"]
+[node name="Scene3D" type="Node3D" parent="BC/BC_middle/BC_center/SubViewportContainer/SubViewport"]
 
-[node name="CSGBox3D3" type="CSGBox3D" parent="BC/BC_center/SubViewportContainer/SubViewport/Scene3D"]
+[node name="CSGBox3D3" type="CSGBox3D" parent="BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0848999, -0.672178, -0.104065)
 size = Vector3(3.29504, 0.307129, 4.21277)
 material = SubResource("StandardMaterial3D_1bvp3")
 
-[node name="cam_anchor" type="Node3D" parent="BC/BC_center/SubViewportContainer/SubViewport/Scene3D"]
+[node name="cam_anchor" type="Node3D" parent="BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D"]
 
-[node name="Camera3D" type="Camera3D" parent="BC/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor"]
+[node name="Camera3D" type="Camera3D" parent="BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor"]
 transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 1, 2)
 current = true
 
-[node name="widget_moveball" parent="BC/BC_center/SubViewportContainer/SubViewport/Scene3D" instance=ExtResource("2_0xm2m")]
+[node name="widget_moveball" parent="BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D" instance=ExtResource("2_0xm2m")]
 visible = false
 
-[node name="BC_right" type="BoxContainer" parent="BC"]
+[node name="BC_right" type="BoxContainer" parent="BC/BC_middle"]
 layout_mode = 2
 size_flags_horizontal = 3
 vertical = true
 
-[node name="GC_commands" type="GridContainer" parent="BC/BC_right"]
+[node name="GC_commands" type="GridContainer" parent="BC/BC_middle/BC_right"]
 layout_mode = 2
 size_flags_horizontal = 3
 columns = 2
 
-[node name="btnBox" type="Button" parent="BC/BC_right/GC_commands"]
+[node name="btnBox" type="Button" parent="BC/BC_middle/BC_right/GC_commands"]
 layout_mode = 2
 text = "Add box"
 
-[node name="btnCylinder" type="Button" parent="BC/BC_right/GC_commands"]
+[node name="btnCylinder" type="Button" parent="BC/BC_middle/BC_right/GC_commands"]
 layout_mode = 2
 text = "Add cylinder"
 
-[node name="btnSphere" type="Button" parent="BC/BC_right/GC_commands"]
+[node name="btnSphere" type="Button" parent="BC/BC_middle/BC_right/GC_commands"]
 layout_mode = 2
 text = "Add sphere"
 
-[node name="btnClear" type="Button" parent="BC/BC_right/GC_commands"]
+[node name="btnClear" type="Button" parent="BC/BC_middle/BC_right/GC_commands"]
 layout_mode = 2
 text = "CLEAR"
 
-[node name="P_inspector" type="Panel" parent="BC/BC_right"]
+[node name="P_inspector" type="Panel" parent="BC/BC_middle/BC_right"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="BC_inspector" type="BoxContainer" parent="BC/BC_right/P_inspector"]
+[node name="BC_inspector" type="BoxContainer" parent="BC/BC_middle/BC_right/P_inspector"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -135,51 +158,51 @@ grow_horizontal = 2
 grow_vertical = 2
 vertical = true
 
-[node name="GC_insp_common" type="GridContainer" parent="BC/BC_right/P_inspector/BC_inspector"]
+[node name="GC_insp_common" type="GridContainer" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector"]
 layout_mode = 2
 size_flags_horizontal = 3
 columns = 2
 
-[node name="lbl1" type="Label" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="lbl1" type="Label" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 text = "Properties"
 
-[node name="Control" type="Control" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="Control" type="Control" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 
-[node name="lbl2" type="Label" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="lbl2" type="Label" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 text = "Name"
 
-[node name="lblName" type="Label" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="lblName" type="Label" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 
-[node name="lbl3" type="Label" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="lbl3" type="Label" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 text = "Color"
 
-[node name="col_picker" type="ColorPickerButton" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="col_picker" type="ColorPickerButton" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Color"
 color = Color(0.481789, 0.481789, 0.481789, 1)
 
-[node name="lbl4" type="Label" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="lbl4" type="Label" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 text = "Position"
 
-[node name="lePos" type="LineEdit" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="lePos" type="LineEdit" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 
-[node name="lbl6" type="Label" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="lbl6" type="Label" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 text = "Rotation"
 
-[node name="leRot" type="LineEdit" parent="BC/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="leRot" type="LineEdit" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 
-[node name="GC_insp_params" type="GridContainer" parent="BC/BC_right/P_inspector/BC_inspector"]
+[node name="GC_insp_params" type="GridContainer" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector"]
 layout_mode = 2
 size_flags_vertical = 3
 columns = 2
@@ -187,10 +210,19 @@ columns = 2
 [node name="AcceptDialog" type="AcceptDialog" parent="."]
 initial_position = 2
 
-[connection signal="empty_clicked" from="BC/BC_left/shape_list" to="." method="_on_shape_list_empty_clicked"]
-[connection signal="item_selected" from="BC/BC_left/shape_list" to="." method="_on_shape_list_item_selected"]
-[connection signal="gui_input" from="BC/BC_center/SubViewportContainer" to="." method="_on_sub_viewport_container_gui_input"]
-[connection signal="pressed" from="BC/BC_right/GC_commands/btnBox" to="." method="_on_btn_box_pressed"]
-[connection signal="pressed" from="BC/BC_right/GC_commands/btnCylinder" to="." method="_on_btn_cylinder_pressed"]
-[connection signal="pressed" from="BC/BC_right/GC_commands/btnSphere" to="." method="_on_btn_sphere_pressed"]
-[connection signal="pressed" from="BC/BC_right/GC_commands/btnClear" to="." method="_on_btn_clear_pressed"]
+[node name="todo" type="Node" parent="."]
+script = ExtResource("3_h2yge")
+
+[node name="FileDialog" type="FileDialog" parent="."]
+initial_position = 2
+access = 2
+root_subfolder = "./data"
+
+[connection signal="id_pressed" from="BC/PC_menu/MenuBar/File" to="." method="_on_file_id_pressed"]
+[connection signal="empty_clicked" from="BC/BC_middle/BC_left/shape_list" to="." method="_on_shape_list_empty_clicked"]
+[connection signal="item_selected" from="BC/BC_middle/BC_left/shape_list" to="." method="_on_shape_list_item_selected"]
+[connection signal="gui_input" from="BC/BC_middle/BC_center/SubViewportContainer" to="." method="_on_sub_viewport_container_gui_input"]
+[connection signal="pressed" from="BC/BC_middle/BC_right/GC_commands/btnBox" to="." method="_on_btn_box_pressed"]
+[connection signal="pressed" from="BC/BC_middle/BC_right/GC_commands/btnCylinder" to="." method="_on_btn_cylinder_pressed"]
+[connection signal="pressed" from="BC/BC_middle/BC_right/GC_commands/btnSphere" to="." method="_on_btn_sphere_pressed"]
+[connection signal="pressed" from="BC/BC_middle/BC_right/GC_commands/btnClear" to="." method="_on_btn_clear_pressed"]
