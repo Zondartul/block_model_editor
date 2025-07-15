@@ -1,6 +1,6 @@
 extends Node
 
-
+var view;
 #-------- 3D mouseover and clicking ---------
 var mouseover_3d = {"obj":null, "sub_obj":null, "shape_info":null, "name":null, "pos":null};
 func clear_mouseover_3d(): for k in mouseover_3d: mouseover_3d[k] = null;

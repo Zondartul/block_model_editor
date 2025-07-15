@@ -1,5 +1,11 @@
 extends Node
 
+var navball_dragging = false;
+@onready var n_cam_anchor = $BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor
+# mouse position argument is unneeded now, but most mouse-based tools will use it.
+func viewport_mmb_down(_pos:Vector2): navball_dragging = true;
+func viewport_mmb_up(_pos:Vector2): navball_dragging = false;
+
 func orbit_camera(rel:Vector2):
 	var rotation_speed = 0.3;
 	var min_pitch = -85.0;

@@ -1,5 +1,7 @@
 extends Node
 
+var view;
+
 # Feature-File state
 const cur_file_default = {"filename":"", "is_open":false, "is_dirty":false}
 var cur_file = cur_file_default.duplicate();
@@ -23,7 +25,7 @@ func NewFile():
 	if not go: return;
 	clear_workspace();
 	cur_file = cur_file_default.duplicate()
-	update_file_dirty_indicator()
+	view.update_file_dirty_indicator(cur_file.is_dirty)
 
 func OpenFile():
 	var go = await clear_dirty_file();
@@ -49,7 +51,7 @@ func OpenFileActual(filename):
 	else:
 		push_error("Can't open file for reading: "+str(FileAccess.get_open_error()))
 	cur_file.is_dirty = false;
-	update_file_dirty_indicator()
+	view.update_file_dirty_indicator(cur_file.is_dirty)
 	
 func SaveFile():
 	if cur_file.filename == "":
@@ -69,7 +71,7 @@ func SaveFileActual(filename):
 		push_error("Can't open file for writing: "+str(FileAccess.get_open_error()))
 		return false;
 	cur_file.is_dirty = false;
-	update_file_dirty_indicator()
+	view.update_file_dirty_indicator(cur_file.is_dirty)
 	return true;
 
 func SaveFileAs():
@@ -97,9 +99,7 @@ func clear_dirty_file():
 
 func on_project_changed():
 	cur_file.is_dirty = true;
-	update_file_dirty_indicator()
-
-
+	view.update_file_dirty_indicator(cur_file.is_dirty)
 
 func DeserializeProject(data:String)->void:
 	push_warning("Warning: dummy func");

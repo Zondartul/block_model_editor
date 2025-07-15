@@ -1,12 +1,14 @@
 extends Node
 
+@onready var cFile = $FileController
+@onready var cInspector = $Inspector
+@onready var cInput3D = $Input3D
+@onready var cSelection = $SelectionController
+@onready var cWorkspace = $WorkspaceController
 
+func connect_signals():
+	pass
 
-func viewport_click(mouse_pos:Vector2):
-	print("Mouse clicked at: ", mouse_pos)
-	update_3d_mouseover(mouse_pos);
-	if mouseover_3d.shape_info: shape_click(mouseover_3d.shape_info);
-	else: void_click();
 
 func shape_click(shape_info):
 	if(inspector_cur_object == shape_info):
