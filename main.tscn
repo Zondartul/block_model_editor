@@ -1,9 +1,20 @@
-[gd_scene load_steps=12 format=3 uid="uid://b7s3y7kocru08"]
+[gd_scene load_steps=23 format=3 uid="uid://b7s3y7kocru08"]
 
 [ext_resource type="Script" uid="uid://ccp76xtdaxhfo" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://da8kfb6sr3bdw" path="res://widget_moveball.tscn" id="2_0xm2m"]
+[ext_resource type="Script" uid="uid://caj18ipv0ko4s" path="res://DataView/data_view.gd" id="2_ycdy4"]
 [ext_resource type="Script" uid="uid://divvas0upohx5" path="res://todo.gd" id="3_h2yge"]
 [ext_resource type="Script" uid="uid://cqoytds8pb2iq" path="res://DataModel/data_model.gd" id="4_1bvp3"]
+[ext_resource type="Script" uid="uid://b7dvf8qo6008h" path="res://DataController/data_controller.gd" id="5_lquwl"]
+[ext_resource type="Script" uid="uid://caowad5pheovg" path="res://DataView/file_view.gd" id="5_w48qg"]
+[ext_resource type="Script" uid="uid://f4at0r8gpn8b" path="res://DataController/file_controller.gd" id="6_7mycd"]
+[ext_resource type="Script" uid="uid://cht2qw2ug4gif" path="res://DataView/inspector_view.gd" id="6_vivmo"]
+[ext_resource type="Script" uid="uid://di4om3of14yxf" path="res://DataController/inspector.gd" id="7_272bh"]
+[ext_resource type="Script" uid="uid://d1pxhus6bwtv1" path="res://DataController/Input3D/input_3d.gd" id="8_5vw27"]
+[ext_resource type="Script" uid="uid://5q82ndwl03y1" path="res://DataController/Input3D/cam_control_3d.gd" id="9_kek77"]
+[ext_resource type="Script" uid="uid://ito3q5jruds2" path="res://DataController/Input3D/mouseover.gd" id="10_4c57u"]
+[ext_resource type="Script" uid="uid://crmavdib1j8vs" path="res://DataController/selection_controller.gd" id="11_dg77c"]
+[ext_resource type="Script" uid="uid://bh0tspx4mue3q" path="res://DataController/workspace_controller.gd" id="12_ycdy4"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ig7tw"]
 sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
@@ -44,6 +55,9 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ig7tw")
 
+[node name="todo" type="Node" parent="."]
+script = ExtResource("3_h2yge")
+
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
 shadow_enabled = true
@@ -51,8 +65,10 @@ shadow_enabled = true
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_h2yge")
 
-[node name="BC" type="BoxContainer" parent="."]
-layout_mode = 1
+[node name="DataView" type="Node" parent="."]
+script = ExtResource("2_ycdy4")
+
+[node name="BC" type="BoxContainer" parent="DataView"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -60,13 +76,13 @@ grow_horizontal = 2
 grow_vertical = 2
 vertical = true
 
-[node name="PC_menu" type="PanelContainer" parent="BC"]
+[node name="PC_menu" type="PanelContainer" parent="DataView/BC"]
 layout_mode = 2
 
-[node name="MenuBar" type="MenuBar" parent="BC/PC_menu"]
+[node name="MenuBar" type="MenuBar" parent="DataView/BC/PC_menu"]
 layout_mode = 2
 
-[node name="File" type="PopupMenu" parent="BC/PC_menu/MenuBar"]
+[node name="File" type="PopupMenu" parent="DataView/BC/PC_menu/MenuBar"]
 item_count = 4
 item_0/text = "New"
 item_0/id = 0
@@ -77,80 +93,80 @@ item_2/id = 2
 item_3/text = "Save As..."
 item_3/id = 3
 
-[node name="BC_middle" type="BoxContainer" parent="BC"]
+[node name="BC_middle" type="BoxContainer" parent="DataView/BC"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="BC_left" type="BoxContainer" parent="BC/BC_middle"]
+[node name="BC_left" type="BoxContainer" parent="DataView/BC/BC_middle"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="shape_list" type="ItemList" parent="BC/BC_middle/BC_left"]
+[node name="shape_list" type="ItemList" parent="DataView/BC/BC_middle/BC_left"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="BC_center" type="BoxContainer" parent="BC/BC_middle"]
+[node name="BC_center" type="BoxContainer" parent="DataView/BC/BC_middle"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 3.0
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="BC/BC_middle/BC_center"]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="DataView/BC/BC_middle/BC_center"]
 layout_mode = 2
 size_flags_horizontal = 3
 stretch = true
 
-[node name="SubViewport" type="SubViewport" parent="BC/BC_middle/BC_center/SubViewportContainer"]
+[node name="SubViewport" type="SubViewport" parent="DataView/BC/BC_middle/BC_center/SubViewportContainer"]
 handle_input_locally = false
 size = Vector2i(687, 613)
 render_target_update_mode = 4
 
-[node name="Scene3D" type="Node3D" parent="BC/BC_middle/BC_center/SubViewportContainer/SubViewport"]
+[node name="Scene3D" type="Node3D" parent="DataView/BC/BC_middle/BC_center/SubViewportContainer/SubViewport"]
 
-[node name="CSGBox3D3" type="CSGBox3D" parent="BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D"]
+[node name="CSGBox3D3" type="CSGBox3D" parent="DataView/BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0848999, -0.672178, -0.104065)
 size = Vector3(3.29504, 0.307129, 4.21277)
 material = SubResource("StandardMaterial3D_1bvp3")
 
-[node name="cam_anchor" type="Node3D" parent="BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D"]
+[node name="cam_anchor" type="Node3D" parent="DataView/BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D"]
 
-[node name="Camera3D" type="Camera3D" parent="BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor"]
+[node name="Camera3D" type="Camera3D" parent="DataView/BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor"]
 transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 1, 2)
 current = true
 
-[node name="widget_moveball" parent="BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D" instance=ExtResource("2_0xm2m")]
+[node name="widget_moveball" parent="DataView/BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D" instance=ExtResource("2_0xm2m")]
 visible = false
 
-[node name="BC_right" type="BoxContainer" parent="BC/BC_middle"]
+[node name="BC_right" type="BoxContainer" parent="DataView/BC/BC_middle"]
 layout_mode = 2
 size_flags_horizontal = 3
 vertical = true
 
-[node name="GC_commands" type="GridContainer" parent="BC/BC_middle/BC_right"]
+[node name="GC_commands" type="GridContainer" parent="DataView/BC/BC_middle/BC_right"]
 layout_mode = 2
 size_flags_horizontal = 3
 columns = 2
 
-[node name="btnBox" type="Button" parent="BC/BC_middle/BC_right/GC_commands"]
+[node name="btnBox" type="Button" parent="DataView/BC/BC_middle/BC_right/GC_commands"]
 layout_mode = 2
 text = "Add box"
 
-[node name="btnCylinder" type="Button" parent="BC/BC_middle/BC_right/GC_commands"]
+[node name="btnCylinder" type="Button" parent="DataView/BC/BC_middle/BC_right/GC_commands"]
 layout_mode = 2
 text = "Add cylinder"
 
-[node name="btnSphere" type="Button" parent="BC/BC_middle/BC_right/GC_commands"]
+[node name="btnSphere" type="Button" parent="DataView/BC/BC_middle/BC_right/GC_commands"]
 layout_mode = 2
 text = "Add sphere"
 
-[node name="btnClear" type="Button" parent="BC/BC_middle/BC_right/GC_commands"]
+[node name="btnClear" type="Button" parent="DataView/BC/BC_middle/BC_right/GC_commands"]
 layout_mode = 2
 text = "CLEAR"
 
-[node name="P_inspector" type="Panel" parent="BC/BC_middle/BC_right"]
+[node name="P_inspector" type="Panel" parent="DataView/BC/BC_middle/BC_right"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="BC_inspector" type="BoxContainer" parent="BC/BC_middle/BC_right/P_inspector"]
+[node name="BC_inspector" type="BoxContainer" parent="DataView/BC/BC_middle/BC_right/P_inspector"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -159,74 +175,101 @@ grow_horizontal = 2
 grow_vertical = 2
 vertical = true
 
-[node name="GC_insp_common" type="GridContainer" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector"]
+[node name="GC_insp_common" type="GridContainer" parent="DataView/BC/BC_middle/BC_right/P_inspector/BC_inspector"]
 layout_mode = 2
 size_flags_horizontal = 3
 columns = 2
 
-[node name="lbl1" type="Label" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="lbl1" type="Label" parent="DataView/BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 text = "Properties"
 
-[node name="Control" type="Control" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="Control" type="Control" parent="DataView/BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 
-[node name="lbl2" type="Label" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="lbl2" type="Label" parent="DataView/BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 text = "Name"
 
-[node name="lblName" type="Label" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="lblName" type="Label" parent="DataView/BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 
-[node name="lbl3" type="Label" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="lbl3" type="Label" parent="DataView/BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 text = "Color"
 
-[node name="col_picker" type="ColorPickerButton" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="col_picker" type="ColorPickerButton" parent="DataView/BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Color"
 color = Color(0.481789, 0.481789, 0.481789, 1)
 
-[node name="lbl4" type="Label" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="lbl4" type="Label" parent="DataView/BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 text = "Position"
 
-[node name="lePos" type="LineEdit" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="lePos" type="LineEdit" parent="DataView/BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 
-[node name="lbl6" type="Label" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="lbl6" type="Label" parent="DataView/BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 text = "Rotation"
 
-[node name="leRot" type="LineEdit" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
+[node name="leRot" type="LineEdit" parent="DataView/BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_common"]
 layout_mode = 2
 
-[node name="GC_insp_params" type="GridContainer" parent="BC/BC_middle/BC_right/P_inspector/BC_inspector"]
+[node name="GC_insp_params" type="GridContainer" parent="DataView/BC/BC_middle/BC_right/P_inspector/BC_inspector"]
 layout_mode = 2
 size_flags_vertical = 3
 columns = 2
 
-[node name="AcceptDialog" type="AcceptDialog" parent="."]
+[node name="AcceptDialog" type="AcceptDialog" parent="DataView"]
 initial_position = 2
 
-[node name="todo" type="Node" parent="."]
-script = ExtResource("3_h2yge")
+[node name="FileView" type="Node" parent="DataView"]
+script = ExtResource("5_w48qg")
 
-[node name="FileDialog" type="FileDialog" parent="."]
+[node name="FileDialog" type="FileDialog" parent="DataView/FileView"]
 initial_position = 2
 access = 2
 root_subfolder = "./data"
 
+[node name="InspectorView" type="Node" parent="DataView"]
+script = ExtResource("6_vivmo")
+
 [node name="DataModel" type="Node" parent="."]
 script = ExtResource("4_1bvp3")
 
-[connection signal="id_pressed" from="BC/PC_menu/MenuBar/File" to="." method="_on_file_id_pressed"]
-[connection signal="empty_clicked" from="BC/BC_middle/BC_left/shape_list" to="." method="_on_shape_list_empty_clicked"]
-[connection signal="item_selected" from="BC/BC_middle/BC_left/shape_list" to="." method="_on_shape_list_item_selected"]
-[connection signal="gui_input" from="BC/BC_middle/BC_center/SubViewportContainer" to="." method="_on_sub_viewport_container_gui_input"]
-[connection signal="pressed" from="BC/BC_middle/BC_right/GC_commands/btnBox" to="." method="_on_btn_box_pressed"]
-[connection signal="pressed" from="BC/BC_middle/BC_right/GC_commands/btnCylinder" to="." method="_on_btn_cylinder_pressed"]
-[connection signal="pressed" from="BC/BC_middle/BC_right/GC_commands/btnSphere" to="." method="_on_btn_sphere_pressed"]
-[connection signal="pressed" from="BC/BC_middle/BC_right/GC_commands/btnClear" to="." method="_on_btn_clear_pressed"]
+[node name="DataController" type="Node" parent="."]
+script = ExtResource("5_lquwl")
+
+[node name="FileController" type="Node" parent="DataController"]
+script = ExtResource("6_7mycd")
+
+[node name="Inspector" type="Node" parent="DataController"]
+script = ExtResource("7_272bh")
+
+[node name="Input3D" type="Node" parent="DataController"]
+script = ExtResource("8_5vw27")
+
+[node name="CamControl3D" type="Node" parent="DataController/Input3D"]
+script = ExtResource("9_kek77")
+
+[node name="Mouseover" type="Node" parent="DataController/Input3D"]
+script = ExtResource("10_4c57u")
+
+[node name="SelectionController" type="Node" parent="DataController"]
+script = ExtResource("11_dg77c")
+
+[node name="WorkspaceController" type="Node" parent="DataController"]
+script = ExtResource("12_ycdy4")
+
+[connection signal="id_pressed" from="DataView/BC/PC_menu/MenuBar/File" to="." method="_on_file_id_pressed"]
+[connection signal="empty_clicked" from="DataView/BC/BC_middle/BC_left/shape_list" to="." method="_on_shape_list_empty_clicked"]
+[connection signal="item_selected" from="DataView/BC/BC_middle/BC_left/shape_list" to="." method="_on_shape_list_item_selected"]
+[connection signal="gui_input" from="DataView/BC/BC_middle/BC_center/SubViewportContainer" to="." method="_on_sub_viewport_container_gui_input"]
+[connection signal="pressed" from="DataView/BC/BC_middle/BC_right/GC_commands/btnBox" to="." method="_on_btn_box_pressed"]
+[connection signal="pressed" from="DataView/BC/BC_middle/BC_right/GC_commands/btnCylinder" to="." method="_on_btn_cylinder_pressed"]
+[connection signal="pressed" from="DataView/BC/BC_middle/BC_right/GC_commands/btnSphere" to="." method="_on_btn_sphere_pressed"]
+[connection signal="pressed" from="DataView/BC/BC_middle/BC_right/GC_commands/btnClear" to="." method="_on_btn_clear_pressed"]
