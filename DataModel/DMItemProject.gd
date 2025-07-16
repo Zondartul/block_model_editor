@@ -8,7 +8,7 @@ func _init():
 
 class Serializer:
 	extends DMItem.Serializer
-	static func serialize(item:DMItem)->Dictionary:
+	func serialize(item:DMItem)->Dictionary:
 		var project_item:DMItemProject = item;
 		var json = {}
 		json["type"] = 'project';
@@ -20,10 +20,10 @@ class Serializer:
 		json["children"] = body_jsons;
 		return json;
 		
-	static func deserialize(json:Dictionary)->DMItem:
+	func deserialize(json:Dictionary)->DMItem:
 		var project_item:DMItemProject = DMItemProject.new();
 		assert('children' in json);
 		for body_json in json["children"]:
-			var body:DMItemBody = DMItemBody.Serializer.deserialize(body_json);
+			var body:DMItemBody = DMItemBody.Serializer.new().deserialize(body_json);
 			project_item.bodies.append(body);
 		return project_item;

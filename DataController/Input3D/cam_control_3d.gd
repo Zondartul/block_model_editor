@@ -1,7 +1,9 @@
 extends Node
+# Node: CamControl3D
 
 var navball_dragging = false;
-@onready var n_cam_anchor = $BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor
+#@onready var n_cam_anchor = $BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor
+@export var n_cam_anchor:Node;
 # mouse position argument is unneeded now, but most mouse-based tools will use it.
 func viewport_mmb_down(_pos:Vector2): navball_dragging = true;
 func viewport_mmb_up(_pos:Vector2): navball_dragging = false;

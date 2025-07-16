@@ -1,7 +1,10 @@
 extends Node
+# Node: Input3D
 
-signal shape_click;
-signal void_click;
+#signal shape_click;
+#signal void_click;
+
+@export var cData:Node;
 
 @onready var cCam3D = $CamControl3D
 @onready var cMouseover = $Mouseover
@@ -25,9 +28,9 @@ func _on_sub_viewport_container_gui_input(event: InputEvent) -> void:
 func viewport_click(mouse_pos:Vector2):
 	print("Mouse clicked at: ", mouse_pos)
 	cMouseover.update_3d_mouseover(mouse_pos);
-	if cMouseover.mouseover_3d.shape_info: shape_click.emit(mouseover_3d.shape_info);
-	else: void_click.emit();
+	if cMouseover.mouseover_3d.shape_info: cData.shape_click(cMouseover.mouseover_3d.shape_info);
+	else: cData.void_click();
 
 func viewport_mouse_move(pos:Vector2, rel:Vector2):
-	orbit_camera(rel);
-	update_3d_mouseover(pos);
+	cCam3D.orbit_camera(rel);
+	cMouseover.update_3d_mouseover(pos);

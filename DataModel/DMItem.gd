@@ -7,5 +7,6 @@ var serializer:Serializer; # API to serialize and deserialize
 var children; # attached items
 
 class Serializer:
-	static func serialize(item:DMItem)->Dictionary: return {}; #takes DMItem, returns string
-	static func deserialize(json:Dictionary)->DMItem: return DMItem.new(); #takes string, returns DMItem
+	func serialize(_item:DMItem)->Dictionary: return {}; #takes DMItem, returns string
+	func deserialize(_json:Dictionary)->DMItem: return DMItem.new(); #takes string, returns DMItem
+	# These functions are non-static because GDScript cannot override static functions in sub-classes

@@ -68,12 +68,8 @@ shadow_enabled = true
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_h2yge")
 
-[node name="DataView" type="Node" parent="." node_paths=PackedStringArray("cInput3D", "cSelection", "cWorkspace", "cFile")]
+[node name="DataView" type="Node" parent="."]
 script = ExtResource("2_ycdy4")
-cInput3D = NodePath("../DataController/Input3D")
-cSelection = NodePath("../DataController/Input3D/SelectionController")
-cWorkspace = NodePath("../DataController/WorkspaceController")
-cFile = NodePath("../DataController/FileController")
 
 [node name="BC" type="BoxContainer" parent="DataView"]
 anchors_preset = 15
@@ -234,100 +230,58 @@ columns = 2
 [node name="AcceptDialog" type="AcceptDialog" parent="DataView"]
 initial_position = 2
 
-[node name="FileView" type="Node" parent="DataView" node_paths=PackedStringArray("n_mb")]
+[node name="FileView" type="Node" parent="DataView"]
 script = ExtResource("5_w48qg")
-n_mb = NodePath("../BC/PC_menu/MenuBar")
 
 [node name="FileDialog" type="FileDialog" parent="DataView/FileView"]
 initial_position = 2
 access = 2
 root_subfolder = "./data"
 
-[node name="InspectorView" type="Node" parent="DataView" node_paths=PackedStringArray("cSelection", "controller", "vData", "n_inspector_grid", "inspector")]
+[node name="InspectorView" type="Node" parent="DataView"]
 script = ExtResource("6_vivmo")
-cSelection = NodePath("../../DataController/Input3D/SelectionController")
-controller = NodePath("../../DataController/Inspector")
-vData = NodePath("..")
-n_inspector_grid = NodePath("../BC/BC_middle/BC_right/P_inspector/BC_inspector/GC_insp_params")
-inspector = NodePath("../BC/BC_middle/BC_right/P_inspector")
 
 [node name="Input3DView" type="Node" parent="DataView"]
 script = ExtResource("7_074og")
 
-[node name="MouseoverView" type="Node" parent="DataView/Input3DView" node_paths=PackedStringArray("vInput3D")]
+[node name="MouseoverView" type="Node" parent="DataView/Input3DView"]
 script = ExtResource("7_yaehf")
-vInput3D = NodePath("..")
 
-[node name="SelectionView" type="Node" parent="DataView/Input3DView" node_paths=PackedStringArray("vInput3D", "n_widget_moveball", "shape_list")]
+[node name="SelectionView" type="Node" parent="DataView/Input3DView"]
 script = ExtResource("8_074og")
-vInput3D = NodePath("..")
-n_widget_moveball = NodePath("../../BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D/widget_moveball")
-shape_list = NodePath("../../BC/BC_middle/BC_left/shape_list")
 
 [node name="DataModel" type="Node" parent="."]
 script = ExtResource("4_1bvp3")
 
-[node name="DataController" type="Node" parent="." node_paths=PackedStringArray("view")]
+[node name="DataController" type="Node" parent="."]
 script = ExtResource("5_lquwl")
-view = NodePath("../DataView")
 
-[node name="FileController" type="Node" parent="DataController" node_paths=PackedStringArray("cWorkspace", "vData", "view", "mData")]
+[node name="FileController" type="Node" parent="DataController"]
 script = ExtResource("6_7mycd")
-cWorkspace = NodePath("../WorkspaceController")
-vData = NodePath("../../DataView")
-view = NodePath("../../DataView/FileView")
-mData = NodePath("../../DataModel")
 
-[node name="Inspector" type="Node" parent="DataController" node_paths=PackedStringArray("cSelection", "vSelection", "cFile", "vData", "view")]
+[node name="Inspector" type="Node" parent="DataController"]
 script = ExtResource("7_272bh")
-cSelection = NodePath("../Input3D/SelectionController")
-vSelection = NodePath("../../DataView/Input3DView/SelectionView")
-cFile = NodePath("../FileController")
-vData = NodePath("../../DataView")
-view = NodePath("../../DataView/InspectorView")
 
-[node name="Input3D" type="Node" parent="DataController" node_paths=PackedStringArray("cData")]
+[node name="Input3D" type="Node" parent="DataController"]
 script = ExtResource("8_5vw27")
-cData = NodePath("..")
 
-[node name="CamControl3D" type="Node" parent="DataController/Input3D" node_paths=PackedStringArray("n_cam_anchor")]
+[node name="CamControl3D" type="Node" parent="DataController/Input3D"]
 script = ExtResource("9_kek77")
-n_cam_anchor = NodePath("../../../DataView/BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor")
 
-[node name="Mouseover" type="Node" parent="DataController/Input3D" node_paths=PackedStringArray("view", "camera", "cSelection", "cData")]
+[node name="Mouseover" type="Node" parent="DataController/Input3D"]
 script = ExtResource("10_4c57u")
-view = NodePath("../../../DataView/Input3DView/MouseoverView")
-camera = NodePath("../../../DataView/BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D/cam_anchor/Camera3D")
-cSelection = NodePath("../SelectionController")
-cData = NodePath("../..")
 
-[node name="SelectionController" type="Node" parent="DataController/Input3D" node_paths=PackedStringArray("cWorkspace", "view", "cInspector")]
+[node name="SelectionController" type="Node" parent="DataController/Input3D"]
 script = ExtResource("11_dg77c")
-cWorkspace = NodePath("../../WorkspaceController")
-view = NodePath("../../../DataView/Input3DView/SelectionView")
-cInspector = NodePath("../../Inspector")
 
-[node name="WorkspaceController" type="Node" parent="DataController" node_paths=PackedStringArray("cData", "vData", "cFile", "cSelection", "vSelection", "scene")]
+[node name="WorkspaceController" type="Node" parent="DataController"]
 script = ExtResource("12_ycdy4")
-cData = NodePath("..")
-vData = NodePath("../../DataView")
-cFile = NodePath("../FileController")
-cSelection = NodePath("../Input3D/SelectionController")
-vSelection = NodePath("../../DataView/Input3DView/SelectionView")
-scene = NodePath("../../DataView/BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D")
 
 [connection signal="id_pressed" from="DataView/BC/PC_menu/MenuBar/File" to="." method="_on_file_id_pressed"]
-[connection signal="id_pressed" from="DataView/BC/PC_menu/MenuBar/File" to="DataView" method="_on_file_id_pressed"]
 [connection signal="empty_clicked" from="DataView/BC/BC_middle/BC_left/shape_list" to="." method="_on_shape_list_empty_clicked"]
-[connection signal="empty_clicked" from="DataView/BC/BC_middle/BC_left/shape_list" to="DataView" method="_on_shape_list_empty_clicked"]
 [connection signal="item_selected" from="DataView/BC/BC_middle/BC_left/shape_list" to="." method="_on_shape_list_item_selected"]
 [connection signal="gui_input" from="DataView/BC/BC_middle/BC_center/SubViewportContainer" to="." method="_on_sub_viewport_container_gui_input"]
-[connection signal="gui_input" from="DataView/BC/BC_middle/BC_center/SubViewportContainer" to="DataView" method="_on_sub_viewport_container_gui_input"]
 [connection signal="pressed" from="DataView/BC/BC_middle/BC_right/GC_commands/btnBox" to="." method="_on_btn_box_pressed"]
-[connection signal="pressed" from="DataView/BC/BC_middle/BC_right/GC_commands/btnBox" to="DataView" method="_on_btn_box_pressed"]
 [connection signal="pressed" from="DataView/BC/BC_middle/BC_right/GC_commands/btnCylinder" to="." method="_on_btn_cylinder_pressed"]
-[connection signal="pressed" from="DataView/BC/BC_middle/BC_right/GC_commands/btnCylinder" to="DataView" method="_on_btn_cylinder_pressed"]
 [connection signal="pressed" from="DataView/BC/BC_middle/BC_right/GC_commands/btnSphere" to="." method="_on_btn_sphere_pressed"]
-[connection signal="pressed" from="DataView/BC/BC_middle/BC_right/GC_commands/btnSphere" to="DataView" method="_on_btn_sphere_pressed"]
 [connection signal="pressed" from="DataView/BC/BC_middle/BC_right/GC_commands/btnClear" to="." method="_on_btn_clear_pressed"]
-[connection signal="pressed" from="DataView/BC/BC_middle/BC_right/GC_commands/btnClear" to="DataView" method="_on_btn_clear_pressed"]

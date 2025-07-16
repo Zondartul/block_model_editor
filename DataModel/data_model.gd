@@ -1,4 +1,6 @@
 extends Node
+# Node: DataModel
+
 # Project: Block Model Editor
 # MVC - Model
 # (the former is Model as in Mesh, the latter is Model in MVC sense)
@@ -13,12 +15,18 @@ const class_DMItemBody = preload("res://DataModel/DMItemBody.gd");
 
 var project;
 
-func deserialize_project(str:String):
-	var json = JSON.parse_string(str);
+func ready():
+	new_project();
+
+func new_project():
+	project = DMItemProject.new();
+
+func deserialize_project(json_str:String):
+	var json = JSON.parse_string(json_str);
 	assert(json);
 	assert('type' in json);
 	assert(json['type'] == "project")
-	project = DMItemProject.Serializer.deserialize(json);
+	project = DMItemProject.Serializer.new().deserialize(json);
 
 func serialize_project()->String:
 	return project.serializer.serialize(project);

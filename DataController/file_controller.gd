@@ -1,6 +1,10 @@
 extends Node
+# Node: FileController
 
-var view;
+@export var cWorkspace:Node;
+@export var vData:Node;
+@export var view:Node;
+@export var mData:Node;
 
 # Feature-File state
 const cur_file_default = {"filename":"", "is_open":false, "is_dirty":false}
@@ -10,7 +14,7 @@ const MENU_BTN_FILE_NEW = 0
 const MENU_BTN_FILE_OPEN = 1
 const MENU_BTN_FILE_SAVE = 2
 const MENU_BTN_FILE_SAVE_AS = 3
-@onready var n_FD:FileDialog = $FileDialog
+
 const class_Promise = preload("res://Promise.gd")
 # for MenuBar - File menu
 func _on_file_id_pressed(id: int) -> void:
@@ -23,17 +27,17 @@ func _on_file_id_pressed(id: int) -> void:
 func NewFile():
 	var go = await clear_dirty_file();
 	if not go: return;
-	clear_workspace();
+	cWorkspace.clear_workspace();
 	cur_file = cur_file_default.duplicate()
 	view.update_file_dirty_indicator(cur_file.is_dirty)
 
 func OpenFile():
 	var go = await clear_dirty_file();
 	if not go: return;
-	n_FD.file_mode = n_FD.FILE_MODE_OPEN_FILE;
-	n_FD.title = "Open File"
-	n_FD.show()
-	var res = await Promise.new(n_FD.file_selected)._else(n_FD.canceled, 0).wait();
+	view.n_FD.file_mode = view.n_FD.FILE_MODE_OPEN_FILE;
+	view.n_FD.title = "Open File"
+	view.n_FD.show()
+	var res = await Promise.new(view.n_FD.file_selected)._else(view.n_FD.canceled, 0).wait();
 	if res.success:
 		OpenFileActual(res.data);
 	else:
@@ -75,10 +79,10 @@ func SaveFileActual(filename):
 	return true;
 
 func SaveFileAs():
-	n_FD.file_mode = n_FD.FILE_MODE_SAVE_FILE;
-	n_FD.title = "Save File"
-	n_FD.show()
-	var res = await Promise.new(n_FD.file_selected)._else(n_FD.canceled, 0).wait();
+	view.n_FD.file_mode = view.n_FD.FILE_MODE_SAVE_FILE;
+	view.n_FD.title = "Save File"
+	view.n_FD.show()
+	var res = await Promise.new(view.n_FD.file_selected)._else(view.n_FD.canceled, 0).wait();
 	if res.success:
 		return SaveFileActual(res.data);
 	else:
@@ -90,7 +94,7 @@ func SaveFileAs():
 # returns false if the user cancels.
 func clear_dirty_file():
 	if cur_file.is_dirty:
-		var pop = show_popup("Current file has changes, save it?", "Warning");
+		var pop = vData.show_popup("Current file has changes, save it?", "Warning");
 		var res = await Promise.new(pop.confirmed,0)._else(pop.canceled,0).wait();
 		if res.success:	return await SaveFile();
 		else:			return false;
@@ -102,9 +106,12 @@ func on_project_changed():
 	view.update_file_dirty_indicator(cur_file.is_dirty)
 
 func DeserializeProject(data:String)->void:
-	push_warning("Warning: dummy func");
+	push_warning("Open/Deserialize: Not sync'd with legacy shape_infos")
+	mData.deserialize_project(data);
 	print(data);
 
 func SerializeProject()->String:
-	push_warning("Warning: dummy func");
-	return "<dummy data>";
+	vData.show_popup("Warning: project saving isn't implemented yet")
+	push_warning("Save/Serialize: Not sync'd with legacy shape_infos, your project wasn't saved")
+	var json_str = mData.serialize_project();
+	return json_str;

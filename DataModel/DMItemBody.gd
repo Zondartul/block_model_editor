@@ -24,7 +24,7 @@ class Generator:
 
 class Serializer:
 	extends DMItem.Serializer;
-	static func serialize(item:DMItem)->Dictionary:
+	func serialize(item:DMItem)->Dictionary:
 		var json = {};
 		json["type"] = "body";
 		assert(item.generator is Generator);
@@ -34,7 +34,7 @@ class Serializer:
 		json["color"] = gen.generator_data["color"];
 		return json;
 		
-	static func deserialize(json:Dictionary)->DMItem:
+	func deserialize(json:Dictionary)->DMItem:
 		var dmi = DMItem.new()
 		dmi.type = "body";
 		for prop in ['shape', 'shape_data', 'color']:

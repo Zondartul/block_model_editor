@@ -1,26 +1,25 @@
 extends Node
+# Node: DataController
 
-@onready var cFile = $FileController
-@onready var cInspector = $Inspector
-@onready var cInput3D = $Input3D
-@onready var cSelection = $SelectionController
-@onready var cWorkspace = $WorkspaceController
+@export var view:Node;
+
+@onready var cSelection = $Input3D/SelectionController
 
 func connect_signals():
 	pass
 
 
 func shape_click(shape_info):
-	if(inspector_cur_object == shape_info):
+	if(cSelection.inspector_cur_object == shape_info):
 		print("same click!")
-		n_widget_moveball.next_mode();
+		view.n_widget_moveball.next_mode();
 	else:
 		print("other click!")
-		deselect_shape();
-		select_shape(shape_info);
+		cSelection.deselect_shape();
+		cSelection.select_shape(shape_info);
 
 func void_click():
-	deselect_shape();
+	cSelection.deselect_shape();
 #---- util ---
 func dicts_equal(dict_A:Dictionary, dict_B:Dictionary):
 	return dict_A.hash() == dict_B.hash()
@@ -31,5 +30,3 @@ func dicts_equal(dict_A:Dictionary, dict_B:Dictionary):
 
 
 # note: signal arguments unnecessary
-func _on_shape_list_empty_clicked(_at_position: Vector2, _mouse_button_index: int) -> void:
-	deselect_shape();
