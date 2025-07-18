@@ -28,7 +28,7 @@ func _on_sub_viewport_container_gui_input(event: InputEvent) -> void:
 func viewport_click(mouse_pos:Vector2):
 	print("Mouse clicked at: ", mouse_pos)
 	cMouseover.update_3d_mouseover(mouse_pos);
-	if cMouseover.mouseover_3d.shape_info: cData.shape_click(cMouseover.mouseover_3d.shape_info);
+	if cMouseover.mouseover_3d.body_handle: cData.shape_click(cMouseover.mouseover_3d.body_handle);
 	else: cData.void_click();
 
 func viewport_mouse_move(pos:Vector2, rel:Vector2):

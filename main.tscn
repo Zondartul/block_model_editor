@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://b7s3y7kocru08"]
+[gd_scene load_steps=27 format=3 uid="uid://b7s3y7kocru08"]
 
 [ext_resource type="Script" uid="uid://ccp76xtdaxhfo" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://da8kfb6sr3bdw" path="res://widget_moveball.tscn" id="2_0xm2m"]
@@ -16,8 +16,9 @@
 [ext_resource type="Script" uid="uid://bs6martvplxae" path="res://DataView/selection_view.gd" id="8_074og"]
 [ext_resource type="Script" uid="uid://5q82ndwl03y1" path="res://DataController/Input3D/cam_control_3d.gd" id="9_kek77"]
 [ext_resource type="Script" uid="uid://ito3q5jruds2" path="res://DataController/Input3D/mouseover.gd" id="10_4c57u"]
+[ext_resource type="Script" uid="uid://1xoinxwh8vm8" path="res://DataView/workspace_view.gd" id="10_cegan"]
 [ext_resource type="Script" uid="uid://crmavdib1j8vs" path="res://DataController/selection_controller.gd" id="11_dg77c"]
-[ext_resource type="Script" uid="uid://bh0tspx4mue3q" path="res://DataController/workspace_controller.gd" id="12_ycdy4"]
+[ext_resource type="Script" uid="uid://bh0tspx4mue3q" path="res://DataController/Workspace/workspace_controller.gd" id="12_ycdy4"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ig7tw"]
 sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
@@ -258,11 +259,15 @@ script = ExtResource("7_074og")
 script = ExtResource("7_yaehf")
 vInput3D = NodePath("..")
 
-[node name="SelectionView" type="Node" parent="DataView/Input3DView" node_paths=PackedStringArray("vInput3D", "n_widget_moveball", "shape_list")]
+[node name="SelectionView" type="Node" parent="DataView/Input3DView" node_paths=PackedStringArray("vInput3D", "n_widget_moveball")]
 script = ExtResource("8_074og")
 vInput3D = NodePath("..")
 n_widget_moveball = NodePath("../../BC/BC_middle/BC_center/SubViewportContainer/SubViewport/Scene3D/widget_moveball")
-shape_list = NodePath("../../BC/BC_middle/BC_left/shape_list")
+
+[node name="WorkspaceView" type="Node" parent="DataView" node_paths=PackedStringArray("shape_list", "controller")]
+script = ExtResource("10_cegan")
+shape_list = NodePath("../BC/BC_middle/BC_left/shape_list")
+controller = NodePath("../../DataController/WorkspaceController")
 
 [node name="DataModel" type="Node" parent="."]
 script = ExtResource("4_1bvp3")
@@ -301,16 +306,19 @@ camera = NodePath("../../../DataView/BC/BC_middle/BC_center/SubViewportContainer
 cSelection = NodePath("../SelectionController")
 cData = NodePath("../..")
 
-[node name="SelectionController" type="Node" parent="DataController/Input3D" node_paths=PackedStringArray("cWorkspace", "view", "cInspector")]
+[node name="SelectionController" type="Node" parent="DataController/Input3D" node_paths=PackedStringArray("vWorkspace", "cWorkspace", "view", "cInspector")]
 script = ExtResource("11_dg77c")
+vWorkspace = NodePath("../../../DataView/WorkspaceView")
 cWorkspace = NodePath("../../WorkspaceController")
 view = NodePath("../../../DataView/Input3DView/SelectionView")
 cInspector = NodePath("../../Inspector")
 
-[node name="WorkspaceController" type="Node" parent="DataController" node_paths=PackedStringArray("cData", "vData", "cFile", "cSelection", "vSelection", "scene")]
+[node name="WorkspaceController" type="Node" parent="DataController" node_paths=PackedStringArray("view", "cData", "vData", "mData", "cFile", "cSelection", "vSelection", "scene")]
 script = ExtResource("12_ycdy4")
+view = NodePath("../../DataView/WorkspaceView")
 cData = NodePath("..")
 vData = NodePath("../../DataView")
+mData = NodePath("../../DataModel")
 cFile = NodePath("../FileController")
 cSelection = NodePath("../Input3D/SelectionController")
 vSelection = NodePath("../../DataView/Input3DView/SelectionView")
@@ -321,6 +329,7 @@ scene = NodePath("../../DataView/BC/BC_middle/BC_center/SubViewportContainer/Sub
 [connection signal="empty_clicked" from="DataView/BC/BC_middle/BC_left/shape_list" to="." method="_on_shape_list_empty_clicked"]
 [connection signal="empty_clicked" from="DataView/BC/BC_middle/BC_left/shape_list" to="DataView" method="_on_shape_list_empty_clicked"]
 [connection signal="item_selected" from="DataView/BC/BC_middle/BC_left/shape_list" to="." method="_on_shape_list_item_selected"]
+[connection signal="item_selected" from="DataView/BC/BC_middle/BC_left/shape_list" to="DataView" method="_on_shape_list_item_selected"]
 [connection signal="gui_input" from="DataView/BC/BC_middle/BC_center/SubViewportContainer" to="." method="_on_sub_viewport_container_gui_input"]
 [connection signal="gui_input" from="DataView/BC/BC_middle/BC_center/SubViewportContainer" to="DataView" method="_on_sub_viewport_container_gui_input"]
 [connection signal="pressed" from="DataView/BC/BC_middle/BC_right/GC_commands/btnBox" to="." method="_on_btn_box_pressed"]

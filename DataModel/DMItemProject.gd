@@ -26,4 +26,5 @@ class Serializer:
 		for body_json in json["children"]:
 			var body:DMItemBody = DMItemBody.Serializer.new().deserialize(body_json);
 			project_item.bodies.append(body);
+			project_item.add_child(body);
 		return project_item;

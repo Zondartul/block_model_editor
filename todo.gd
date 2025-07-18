@@ -48,3 +48,7 @@ extends Node
 #    +- camera/raycasts (3D-2D input translator)
 #    +- 3d mouseover (3D input state)
 #  
+# Random todos:
+# [MVC] use Data Binding instead of view.update()
+#   -- https://github.com/HotariTobu/gd-data-binding
+#

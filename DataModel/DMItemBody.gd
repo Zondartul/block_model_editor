@@ -7,17 +7,22 @@ var color;
 func _init(_shape_type:String, _generator_data=null):
 	serializer = Serializer.new()
 	generator = Generator.new(_shape_type, _generator_data);
+	generator.generator_params_changed.connect(on_generator_params_changed);
+	generator.generator_shapes_changed.connect(on_generator_shapes_changed);
+
+func on_generator_params_changed(): DM_changed.emit(self); DM_view_changed.emit(self);
+func on_generator_shapes_changed(): DM_view_changed.emit(self);
 
 class Generator:
 	const shape_types = ['box', 'cylinder', 'sphere'];
-	var shape_type;
+	var _shape_type;
 	var generator:ShapeGenerator;
-	var generator_data;
-	func _init(_shape_type:String, _generator_data=null):
-		shape_type = _shape_type
-		generator_data = _generator_data;
-		assert(shape_type in shape_types);
-		match shape_type:
+	var _generator_data;
+	func _init(new_shape_type:String, new_generator_data=null):
+		_shape_type = new_shape_type
+		_generator_data = new_generator_data;
+		assert(_shape_type in shape_types);
+		match _shape_type:
 			'box': generator = ShapeGenBox.new()
 			'cylinder': generator = ShapeGenCylinder.new()
 			'sphere': generator = ShapeGenSphere.new()

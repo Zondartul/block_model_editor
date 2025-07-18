@@ -13,7 +13,7 @@ extends Node
 var inspector_param_widgets = {}
 
 func populate_inspector_params():
-	var params = cSelection.inspector_cur_object.generator.get_param_list();
+	var params = cSelection.inspector_cur_object.get_gen().get_param_list();
 	for p in params:
 		var lbl = Label.new()
 		lbl.text = p.name;

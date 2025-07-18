@@ -8,7 +8,7 @@ extends Node
 @export var cData:Node; # for util/dicts_equal
 
 #-------- 3D mouseover and clicking ---------
-var mouseover_3d = {"obj":null, "sub_obj":null, "shape_info":null, "name":null, "pos":null};
+var mouseover_3d = {"obj":null, "sub_obj":null, "body_handle":null, "name":null, "pos":null};
 func clear_mouseover_3d(): for k in mouseover_3d: mouseover_3d[k] = null;
 
 signal mouseover_3d_changed(new_mouseover_3d:Dictionary)
@@ -23,19 +23,22 @@ func update_3d_mouseover(mouse_pos:Vector2):
 	var ray_query = PhysicsRayQueryParameters3D.create(ray_origin, ray_origin + ray_dir * 1000.0)
 	var hit = space_state.intersect_ray(ray_query)
 	if hit:
-		var shape_info = cSelection.get_shape_info_collider(hit.collider)
 		mouseover_3d.obj = hit.collider;
-		if shape_info:
-			mouseover_3d.shape_info = shape_info;
+		var body_handle = cSelection.get_body_handle_from_collider(hit.collider)
+		if body_handle:
+			mouseover_3d.body_handle = body_handle;
+		else:
+			push_error("mouseover hit but no body handle");
 	if not cData.dicts_equal(old_mouseover_3d, mouseover_3d):
 		mouseover_3d_changed.emit(mouseover_3d.duplicate())
 		if mouseover_3d.obj:
-			var shape_info2 = mouseover_3d.shape_info;
-			if not shape_info2:
-				var body = hit.collider;
-				var vis_shape = body.vis_shape;
-				assert(vis_shape);
-				shape_info2 = {"body":body, "vis_shape":vis_shape};
-			view.mouseover_gizmo.attach(shape_info2);
+			var body_handle2 = mouseover_3d.body_handle;
+		#	if not body_handle2: # -- bodies without a handle? Like a gizmo? no, gizmos should have handles.
+		#		var body = hit.collider;
+		#		var vis_shape = body.vis_shape;
+		#		assert(vis_shape);
+		#		body_handle2 = {"body":body, "vis_shape":vis_shape};
+			if not body_handle2: return;
+			view.mouseover_gizmo.attach(body_handle2);
 		else:
 			view.mouseover_gizmo.detach();

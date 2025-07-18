@@ -15,11 +15,12 @@ const class_DMItemBody = preload("res://DataModel/DMItemBody.gd");
 
 var project;
 
-func ready():
+func _ready():
 	new_project();
 
 func new_project():
 	project = DMItemProject.new();
+	add_child(project);
 
 func deserialize_project(json_str:String):
 	var json = JSON.parse_string(json_str);
@@ -30,3 +31,7 @@ func deserialize_project(json_str:String):
 
 func serialize_project()->String:
 	return project.serializer.serialize(project);
+
+func add_body(body_item:DMItemBody):
+	project.add_child(body_item);
+	

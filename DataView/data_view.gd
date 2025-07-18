@@ -47,3 +47,4 @@ func _on_btn_cylinder_pressed() -> void:	cWorkspace._on_btn_cylinder_pressed();
 func _on_btn_sphere_pressed() -> void:		cWorkspace._on_btn_sphere_pressed();
 func _on_btn_clear_pressed() -> void:		cWorkspace._on_btn_clear_pressed();
 func _on_file_id_pressed(id: int) -> void:	cFile._on_file_id_pressed(id);
+func _on_shape_list_item_selected(index: int) -> void: cSelection._on_shape_list_item_selected(index);
